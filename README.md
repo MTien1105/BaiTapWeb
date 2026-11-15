@@ -1,4 +1,4 @@
-# BÀI TẬP: ĐĂNG NHẬP (SESSION & COOKIE) VÀ ĐĂNG KÝ VỚI JPA
+# BÀI TẬP TUẦN 2: ĐĂNG NHẬP (SESSION & COOKIE) VÀ ĐĂNG KÝ VỚI JPA
 
 Dự án Web Java Servlet - JSP áp dụng công nghệ **JPA (Hibernate)** để quản lý dữ liệu người dùng, triển khai mô hình **MVC** với các tính năng:
 - **Đăng ký tài khoản (Register)**: Kiểm tra hợp lệ và trùng lặp qua truy vấn JPQL, mã hóa/lưu trữ dữ liệu bằng JPA `EntityManager`.
