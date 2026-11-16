@@ -31,7 +31,7 @@ public class User implements Serializable {
     @Column(name = "fullname", columnDefinition = "NVARCHAR(100)", nullable = false)
     private String fullName;
 
-    @Column(name = "password", length = 100, nullable = false)
+    @Column(name = "password", length = 200, nullable = false)
     private String passWord;
 
     @Column(name = "avatar", length = 255)
@@ -46,6 +46,12 @@ public class User implements Serializable {
     @Column(name = "createddate")
     private Date createdDate;
 
+    @Column(name = "status", nullable = false)
+    private int status = 1; // 1: Kích hoạt (Active), 0: Chưa kích hoạt (Pending OTP)
+
+    @Column(name = "code", length = 50)
+    private String code; // Lưu mã xác thực OTP
+
     public User() {
     }
 
@@ -58,6 +64,20 @@ public class User implements Serializable {
         this.roleid = roleid;
         this.phone = phone;
         this.createdDate = createdDate;
+        this.status = 1;
+    }
+
+    public User(String email, String userName, String fullName, String passWord, String avatar, int roleid, String phone, Date createdDate, int status, String code) {
+        this.email = email;
+        this.userName = userName;
+        this.fullName = fullName;
+        this.passWord = passWord;
+        this.avatar = avatar;
+        this.roleid = roleid;
+        this.phone = phone;
+        this.createdDate = createdDate;
+        this.status = status;
+        this.code = code;
     }
 
     public User(int id, String email, String userName, String fullName, String passWord, String avatar, int roleid, String phone, Date createdDate) {
@@ -70,6 +90,7 @@ public class User implements Serializable {
         this.roleid = roleid;
         this.phone = phone;
         this.createdDate = createdDate;
+        this.status = 1;
     }
 
     public int getId() {
@@ -144,9 +165,26 @@ public class User implements Serializable {
         this.createdDate = createdDate;
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
     @Override
     public String toString() {
         return "User [id=" + id + ", email=" + email + ", userName=" + userName + ", fullName=" + fullName
-                + ", roleid=" + roleid + ", phone=" + phone + ", createdDate=" + createdDate + "]";
+                + ", roleid=" + roleid + ", phone=" + phone + ", createdDate=" + createdDate
+                + ", status=" + status + ", code=" + code + "]";
     }
 }

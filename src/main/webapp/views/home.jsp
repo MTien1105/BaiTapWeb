@@ -18,6 +18,8 @@
         .info-label { font-weight: 600; color: #495057; }
         .info-val { color: #212529; }
         .badge { display: inline-block; padding: 3px 8px; background: #007bff; color: #fff; border-radius: 4px; font-size: 13px; font-weight: 500; }
+        .badge-active { background: #28a745; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 13px; font-weight: 500; }
+        .badge-sec { background: #17a2b8; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 13px; font-weight: 500; }
         .btn-logout { display: block; width: 100%; text-align: center; margin-top: 24px; padding: 12px; background: #dc3545; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; transition: background 0.2s; }
         .btn-logout:hover { background: #c82333; }
     </style>
@@ -27,7 +29,7 @@
 
     <div class="main-content">
         <h1>🎉 Đăng Nhập Thành Công!</h1>
-        <p class="subtitle">Dữ liệu tài khoản được quản lý và truy xuất qua công nghệ JPA (Hibernate).</p>
+        <p class="subtitle">Dữ liệu tài khoản được quản lý và bảo mật qua JPA (Hibernate) & BCrypt Password Hash.</p>
 
         <c:if test="${sessionScope.account != null}">
             <div class="user-card">
@@ -47,6 +49,14 @@
                 <div class="info-row">
                     <span class="info-label">Số điện thoại:</span>
                     <span class="info-val">${sessionScope.account.phone != null ? sessionScope.account.phone : 'Chưa cập nhật'}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Trạng thái kích hoạt:</span>
+                    <span class="info-val"><span class="badge-active">✅ Đã kích hoạt qua OTP (Status: ${sessionScope.account.status})</span></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Cơ chế bảo mật:</span>
+                    <span class="info-val"><span class="badge-sec">🔒 BCrypt Password Hashed</span></span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Vai trò:</span>

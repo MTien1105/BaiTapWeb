@@ -7,6 +7,7 @@ import jakarta.persistence.TypedQuery;
 import vn.iotstar.configs.JPAConfig;
 import vn.iotstar.dao.UserDao;
 import vn.iotstar.model.User;
+import vn.iotstar.util.PasswordUtil;
 
 public class UserDaoImpl implements UserDao {
 
@@ -28,9 +29,10 @@ public class UserDaoImpl implements UserDao {
                     EntityTransaction trans = em.getTransaction();
                     try {
                         trans.begin();
-                        User admin = new User("admin@iotstar.vn", "admin", "Admin System", "123456", null, 1, "0901234567", new java.sql.Date(System.currentTimeMillis()));
-                        User manager = new User("manager@iotstar.vn", "manager", "Manager Staff", "123456", null, 2, "0902345678", new java.sql.Date(System.currentTimeMillis()));
-                        User user = new User("trungnh@hcmute.edu.vn", "trungnh", "Nguyen Huu Trung", "123456", null, 5, "0908617108", new java.sql.Date(System.currentTimeMillis()));
+                        String defaultPass = PasswordUtil.hashPassword("123456");
+                        User admin = new User("admin@iotstar.vn", "admin", "Admin System", defaultPass, null, 1, "0901234567", new java.sql.Date(System.currentTimeMillis()), 1, null);
+                        User manager = new User("manager@iotstar.vn", "manager", "Manager Staff", defaultPass, null, 2, "0902345678", new java.sql.Date(System.currentTimeMillis()), 1, null);
+                        User user = new User("trungnh@hcmute.edu.vn", "trungnh", "Nguyen Huu Trung", defaultPass, null, 5, "0908617108", new java.sql.Date(System.currentTimeMillis()), 1, null);
                         em.persist(admin);
                         em.persist(manager);
                         em.persist(user);
@@ -102,6 +104,20 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public User findByEmail(String email) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT u FROM User u WHERE u.email = :email";
+            TypedQuery<User> query = em.createQuery(jpql, User.class);
+            query.setParameter("email", email);
+            List<User> list = query.getResultList();
+            return list.isEmpty() ? null : list.get(0);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public boolean updatePassword(String username, String newPassword) {
         EntityManager em = JPAConfig.getEntityManager();
         EntityTransaction trans = em.getTransaction();
@@ -113,7 +129,8 @@ public class UserDaoImpl implements UserDao {
             List<User> list = query.getResultList();
             if (!list.isEmpty()) {
                 User user = list.get(0);
-                user.setPassWord(newPassword);
+                String hashedPassword = PasswordUtil.isBCryptHashed(newPassword) ? newPassword : PasswordUtil.hashPassword(newPassword);
+                user.setPassWord(hashedPassword);
                 em.merge(user);
                 trans.commit();
                 return true;

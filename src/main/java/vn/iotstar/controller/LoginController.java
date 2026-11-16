@@ -14,10 +14,13 @@ import vn.iotstar.model.User;
 import vn.iotstar.service.UserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.PasswordUtil;
 
 @SuppressWarnings("serial")
 @WebServlet(urlPatterns = "/login")
 public class LoginController extends HttpServlet {
+
+    private final UserService service = new UserServiceImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -27,24 +30,30 @@ public class LoginController extends HttpServlet {
             return;
         }
 
-        // Check cookie
+        // Kiểm tra cookie Remember Me
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(Constant.COOKIE_REMEMBER)) {
                     session = req.getSession(true);
                     session.setAttribute("username", cookie.getValue());
-                    UserService service = new UserServiceImpl();
                     User user = service.get(cookie.getValue());
-                    if (user != null) {
+                    if (user != null && user.getStatus() == 1) {
                         session.setAttribute("account", user);
+                        resp.sendRedirect(req.getContextPath() + "/waiting");
+                        return;
                     }
-                    resp.sendRedirect(req.getContextPath() + "/waiting");
-                    return;
                 }
             }
         }
-        req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+
+        // Lấy thông báo flashMessage từ session nếu có (ví dụ: sau khi kích hoạt hoặc đổi mật khẩu)
+        if (session != null && session.getAttribute("flashMessage") != null) {
+            req.setAttribute("message", session.getAttribute("flashMessage"));
+            session.removeAttribute("flashMessage");
+        }
+
+        req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
     }
 
     @Override
@@ -58,30 +67,40 @@ public class LoginController extends HttpServlet {
         String remember = req.getParameter("remember");
         boolean isRememberMe = (remember != null);
 
-        System.out.println("[DEBUG LOGIN] username=" + username + ", remember=" + remember + ", isRememberMe=" + isRememberMe);
-
-        String alertMsg = "";
         if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
-            alertMsg = "Tài khoản hoặc mật khẩu không được rỗng";
-            req.setAttribute("alert", alertMsg);
-            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không được để trống!");
+            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
             return;
         }
 
-        UserService service = new UserServiceImpl();
-        User user = service.login(username, password);
-        if (user != null) {
-            HttpSession session = req.getSession(true);
-            session.setAttribute("account", user);
-            if (isRememberMe) {
-                saveRememberMe(resp, username);
-            }
-            resp.sendRedirect(req.getContextPath() + "/waiting");
-        } else {
-            alertMsg = "Tài khoản hoặc mật khẩu không đúng";
-            req.setAttribute("alert", alertMsg);
-            req.getRequestDispatcher("/views/login.jsp").forward(req, resp);
+        User user = service.get(username.trim());
+
+        // 1. Kiểm tra tài khoản tồn tại và kiểm tra mật khẩu đã hash bằng BCrypt
+        if (user == null || !PasswordUtil.checkPassword(password, user.getPassWord())) {
+            req.setAttribute("alert", "Tên tài khoản hoặc mật khẩu không chính xác!");
+            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            return;
         }
+
+        // 2. Kiểm tra tài khoản đã kích hoạt qua OTP hay chưa (status == 1)
+        if (user.getStatus() == 0) {
+            req.setAttribute("unactivatedEmail", user.getEmail());
+            req.setAttribute("alert", "Tài khoản chưa được kích hoạt qua mã OTP!");
+            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            return;
+        }
+
+        // 3. Đăng nhập thành công -> Lưu session
+        HttpSession session = req.getSession(true);
+        session.setAttribute("account", user);
+        session.setAttribute("username", user.getUserName());
+
+        // 4. Nếu người dùng chọn "Nhớ tôi" -> Tạo cookie
+        if (isRememberMe) {
+            saveRememberMe(resp, username.trim());
+        }
+
+        resp.sendRedirect(req.getContextPath() + "/waiting");
     }
 
     private void saveRememberMe(HttpServletResponse response, String username) {
@@ -89,6 +108,5 @@ public class LoginController extends HttpServlet {
         cookie.setMaxAge(30 * 60); // 30 phút
         cookie.setPath("/");
         response.addCookie(cookie);
-        System.out.println("[DEBUG COOKIE] Saved cookie " + Constant.COOKIE_REMEMBER + "=" + username);
     }
 }

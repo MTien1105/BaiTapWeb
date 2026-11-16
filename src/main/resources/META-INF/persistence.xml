@@ -11,7 +11,12 @@
         <class>vn.iotstar.model.User</class>
 
         <properties>
-            <!-- Kết nối SQL Server -->
+            <!-- Kết nối SQL Server - Mixed Mode (sa/123) -->
+            <!-- URL dùng instanceName thay port cứng (cần SQL Browser running) -->
+            <!-- <property name="jakarta.persistence.jdbc.url"
+                      value="jdbc:sqlserver://localhost;instanceName=SQLEXPRESS;encrypt=true;trustServerCertificate=true;databaseName=ShoppingDB" /> -->
+
+            <!-- URL dùng port cố định 1433 (sau khi đặt port cố định trong Configuration Manager) -->
             <property name="jakarta.persistence.jdbc.url"
                       value="jdbc:sqlserver://localhost:1433;encrypt=true;trustServerCertificate=true;databaseName=ShoppingDB" />
             <property name="jakarta.persistence.jdbc.driver"
@@ -23,6 +28,10 @@
             <property name="hibernate.format_sql" value="true" />
             <property name="hibernate.hbm2ddl.auto" value="update" />
             <property name="hibernate.dialect" value="org.hibernate.dialect.SQLServerDialect" />
+            <!-- Giảm timeout kết nối xuống 3 giây để fallback nhanh sang H2 -->
+            <property name="hibernate.connection.pool_size" value="2" />
+            <!-- Timeout JDBC level (thêm vào URL) -->
+
         </properties>
     </persistence-unit>
 

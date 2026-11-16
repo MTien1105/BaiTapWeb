@@ -18,7 +18,16 @@ public class LogoutController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Hủy session
+        doLogout(req, resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doLogout(req, resp);
+    }
+
+    private void doLogout(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // Hủy toàn bộ thông tin đăng nhập trong session
         HttpSession session = req.getSession(false);
         if (session != null) {
             session.removeAttribute("account");
@@ -26,7 +35,7 @@ public class LogoutController extends HttpServlet {
             session.invalidate();
         }
 
-        // Xóa cookie remember me nếu có
+        // Xóa sạch cookie Remember Me
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -39,6 +48,8 @@ public class LogoutController extends HttpServlet {
             }
         }
 
+        HttpSession newSession = req.getSession(true);
+        newSession.setAttribute("flashMessage", "Bạn đã đăng xuất khỏi hệ thống thành công.");
         resp.sendRedirect(req.getContextPath() + "/login");
     }
 }

@@ -1,6 +1,8 @@
 package vn.iotstar.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import vn.iotstar.service.UserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
+import vn.iotstar.util.EmailUtil;
 
 @SuppressWarnings("serial")
 @WebServlet(urlPatterns = "/register")
@@ -21,18 +24,16 @@ public class RegisterController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
-        if (session != null && session.getAttribute("username") != null) {
+        if (session != null && session.getAttribute("account") != null) {
             resp.sendRedirect(req.getContextPath() + "/waiting");
             return;
         }
 
-        // Check cookie
+        // Check cookie Remember Me
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(Constant.COOKIE_REMEMBER)) {
-                    session = req.getSession(true);
-                    session.setAttribute("username", cookie.getValue());
                     resp.sendRedirect(req.getContextPath() + "/waiting");
                     return;
                 }
@@ -64,32 +65,47 @@ public class RegisterController extends HttpServlet {
             return;
         }
 
-        if (service.checkExistEmail(email)) {
-            alertMsg = "Email đã tồn tại!";
+        if (service.checkExistEmail(email.trim())) {
+            alertMsg = "Email này đã được sử dụng!";
             req.setAttribute("alert", alertMsg);
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
             return;
         }
 
-        if (service.checkExistUsername(username)) {
-            alertMsg = "Tài khoản đã tồn tại!";
+        if (service.checkExistUsername(username.trim())) {
+            alertMsg = "Tên tài khoản này đã tồn tại!";
             req.setAttribute("alert", alertMsg);
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
             return;
         }
 
-        if (phone != null && !phone.trim().isEmpty() && service.checkExistPhone(phone)) {
-            alertMsg = "Số điện thoại đã tồn tại!";
+        if (phone != null && !phone.trim().isEmpty() && service.checkExistPhone(phone.trim())) {
+            alertMsg = "Số điện thoại này đã được sử dụng!";
             req.setAttribute("alert", alertMsg);
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
             return;
         }
 
-        boolean isSuccess = service.register(username, password, email, fullname, phone);
+        // 1. Sinh mã OTP kích hoạt tài khoản
+        String otp = EmailUtil.generateOtp();
+
+        // 2. Lưu tài khoản mới vào cơ sở dữ liệu với status = 0 (chưa kích hoạt) và mật khẩu đã hash
+        boolean isSuccess = service.register(username.trim(), password, email.trim(), fullname.trim(), phone != null ? phone.trim() : null, otp);
+
         if (isSuccess) {
-            resp.sendRedirect(req.getContextPath() + "/login");
+            // 3. Gửi email chứa mã OTP đến hòm thư người dùng
+            String emailContent = EmailUtil.buildActivationEmail(fullname, otp);
+            EmailUtil.sendEmail(email.trim(), "Mã xác thực kích hoạt tài khoản mới", emailContent);
+
+            // 4. Lưu email vào Session và chuyển hướng đến trang nhập mã OTP
+            HttpSession session = req.getSession(true);
+            session.setAttribute("otpEmail", email.trim());
+            session.setAttribute("demoOtp", otp);
+
+            String encodedEmail = URLEncoder.encode(email.trim(), StandardCharsets.UTF_8);
+            resp.sendRedirect(req.getContextPath() + "/verify-code?email=" + encodedEmail);
         } else {
-            alertMsg = "System error!";
+            alertMsg = "Đăng ký không thành công do lỗi hệ thống! Vui lòng thử lại.";
             req.setAttribute("alert", alertMsg);
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
         }
