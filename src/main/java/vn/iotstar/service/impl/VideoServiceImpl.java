@@ -51,6 +51,26 @@ public class VideoServiceImpl implements IVideoService {
     }
 
     @Override
+    public List<Video> findByUserId(int userId, int page, int pageSize) {
+        return videoDao.findByUserId(userId, page, pageSize);
+    }
+
+    @Override
+    public int countByUserId(int userId) {
+        return videoDao.countByUserId(userId);
+    }
+
+    @Override
+    public List<Video> findAllActivePaginated(int page, int pageSize) {
+        return videoDao.findAllActivePaginated(page, pageSize);
+    }
+
+    @Override
+    public int countActive() {
+        return videoDao.countActive();
+    }
+
+    @Override
     public List<Video> searchByTitle(String keyword) {
         return videoDao.searchByTitle(keyword);
     }

@@ -71,8 +71,9 @@
                             <span class="badge badge-role">Role ID: ${sessionScope.account.roleid}</span>
                         </div>
                     </div>
-                    <div>
-                        <a href="${pageContext.request.contextPath}/admin/videos" class="btn-manage-video">📺 Vào Quản Lý Video (CRUD)</a>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="${pageContext.request.contextPath}/video" style="display: inline-block; padding: 10px 18px; background: #007bff; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">🎬 Video Của Tôi (/video)</a>
+                        <a href="${pageContext.request.contextPath}/admin/videos" class="btn-manage-video">📺 Quản Lý Video (CRUD)</a>
                     </div>
                 </div>
             </c:when>
@@ -91,7 +92,9 @@
         <!-- Danh sách 10 Video Mới Nhất -->
         <div class="section-header">
             <h3>🔥 10 VIDEO MỚI NHẤT TRÊN HỆ THỐNG</h3>
-            <span>Tự động sắp xếp theo thứ tự mới nhất (JPA Query)</span>
+            <div>
+                <a href="${pageContext.request.contextPath}/video" style="padding: 6px 14px; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 13px;">👉 Xem Tất Cả Video (Phân trang 6sp/trang)</a>
+            </div>
         </div>
 
         <c:choose>

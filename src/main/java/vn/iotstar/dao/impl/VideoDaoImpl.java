@@ -121,6 +121,60 @@ public class VideoDaoImpl implements IVideoDao {
     }
 
     @Override
+    public List<Video> findByUserId(int userId, int page, int pageSize) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v WHERE v.user.id = :userId AND v.active = 1 ORDER BY v.videoId DESC";
+            TypedQuery<Video> query = em.createQuery(jpql, Video.class);
+            query.setParameter("userId", userId);
+            query.setFirstResult((page - 1) * pageSize);
+            query.setMaxResults(pageSize);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public int countByUserId(int userId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT count(v) FROM Video v WHERE v.user.id = :userId AND v.active = 1";
+            Query query = em.createQuery(jpql);
+            query.setParameter("userId", userId);
+            return ((Long) query.getSingleResult()).intValue();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Video> findAllActivePaginated(int page, int pageSize) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v WHERE v.active = 1 ORDER BY v.videoId DESC";
+            TypedQuery<Video> query = em.createQuery(jpql, Video.class);
+            query.setFirstResult((page - 1) * pageSize);
+            query.setMaxResults(pageSize);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public int countActive() {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT count(v) FROM Video v WHERE v.active = 1";
+            Query query = em.createQuery(jpql);
+            return ((Long) query.getSingleResult()).intValue();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public List<Video> searchByTitle(String keyword) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
