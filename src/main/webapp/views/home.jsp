@@ -59,35 +59,23 @@
 
     <div class="main-container">
         <!-- Khu vực thông tin người dùng nếu đã đăng nhập -->
-        <c:choose>
-            <c:when test="${sessionScope.account != null}">
-                <div class="user-welcome-box">
-                    <div class="user-welcome-info">
-                        <h2>👋 Chào mừng trở lại, ${sessionScope.account.fullName}!</h2>
-                        <p>Tài khoản: <strong>${sessionScope.account.userName}</strong> | Email: ${sessionScope.account.email}</p>
-                        <div class="user-meta-tags">
-                            <span class="badge badge-active">✅ Kích hoạt qua OTP</span>
-                            <span class="badge badge-sec">🔒 BCrypt Hash</span>
-                            <span class="badge badge-role">Role ID: ${sessionScope.account.roleid}</span>
-                        </div>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <a href="${pageContext.request.contextPath}/video" style="display: inline-block; padding: 10px 18px; background: #007bff; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">🎬 Video Của Tôi (/video)</a>
-                        <a href="${pageContext.request.contextPath}/admin/videos" class="btn-manage-video">📺 Quản Lý Video (CRUD)</a>
+        <c:if test="${sessionScope.account != null}">
+            <div class="user-welcome-box">
+                <div class="user-welcome-info">
+                    <h2>👋 Chào mừng trở lại, ${sessionScope.account.fullName}!</h2>
+                    <p>Tài khoản: <strong>${sessionScope.account.userName}</strong> | Email: ${sessionScope.account.email}</p>
+                    <div class="user-meta-tags">
+                        <span class="badge badge-active">✅ Kích hoạt qua OTP</span>
+                        <span class="badge badge-sec">🔒 BCrypt Hash</span>
+                        <span class="badge badge-role">Role ID: ${sessionScope.account.roleid}</span>
                     </div>
                 </div>
-            </c:when>
-            <c:otherwise>
-                <div class="guest-banner">
-                    <h2>🎬 CHÀO MỪNG BẠN ĐẾN VỚI HỆ THỐNG VIDEO & JPA!</h2>
-                    <p>Khám phá kho video học tập chất lượng cao với công nghệ JPA 3.0 & Hibernate 6.x</p>
-                    <div>
-                        <a href="${pageContext.request.contextPath}/login">Đăng Nhập</a>
-                        <a href="${pageContext.request.contextPath}/register" style="background: #28a745; color: #fff;">Đăng Ký Tài Khoản</a>
-                    </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="${pageContext.request.contextPath}/video" style="display: inline-block; padding: 10px 18px; background: #007bff; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">🎬 Video Của Tôi (/video)</a>
+                    <a href="${pageContext.request.contextPath}/admin/videos" class="btn-manage-video">📺 Quản Lý Video (CRUD)</a>
                 </div>
-            </c:otherwise>
-        </c:choose>
+            </div>
+        </c:if>
 
         <!-- Danh sách 10 Video Mới Nhất -->
         <div class="section-header">
@@ -144,15 +132,8 @@
                                     <span style="color: #888; font-size: 11px;">Mã: ${v.videoId}</span>
                                 </div>
                                 <div style="margin-top: 10px;">
-                                    <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="display: block; text-align: center; padding: 8px 12px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 13px; ${sessionScope.account != null ? 'background: #007bff; color: #fff;' : 'background: #fff3cd; color: #856404; border: 1px solid #ffeeba;'}">
-                                        <c:choose>
-                                            <c:when test="${sessionScope.account != null}">
-                                                ▶ Xem Video Ngay
-                                            </c:when>
-                                            <c:otherwise>
-                                                🔒 Đăng nhập để xem
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="display: block; text-align: center; padding: 8px 12px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 13px; background: #007bff; color: #fff;">
+                                        ▶ Xem Video
                                     </a>
                                 </div>
                             </div>

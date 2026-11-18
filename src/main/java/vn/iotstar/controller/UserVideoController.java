@@ -40,15 +40,7 @@ public class UserVideoController extends HttpServlet {
                 return;
             }
 
-            // BẮT BUỘC ĐĂNG NHẬP MỚI ĐƯỢC VÀO XEM VIDEO
-            if (loggedInUser == null) {
-                String targetUrl = req.getContextPath() + "/video/detail?id=" + URLEncoder.encode(videoId.trim(), StandardCharsets.UTF_8);
-                String alertMsg = URLEncoder.encode("Bạn cần đăng nhập tài khoản để xem nội dung video này!", StandardCharsets.UTF_8);
-                resp.sendRedirect(req.getContextPath() + "/login?alert=" + alertMsg + "&redirect=" + URLEncoder.encode(targetUrl, StandardCharsets.UTF_8));
-                return;
-            }
-
-            // Đã đăng nhập -> Tải thông tin video và tăng lượt xem (Views + 1)
+            // Tải thông tin video và tăng lượt xem (Views + 1) - Không cần đăng nhập
             Video video = videoService.findById(videoId.trim());
             if (video == null) {
                 resp.sendRedirect(req.getContextPath() + "/video");

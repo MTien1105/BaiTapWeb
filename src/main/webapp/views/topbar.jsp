@@ -10,19 +10,17 @@
     </div>
     <c:choose>
         <c:when test="${sessionScope.account == null}">
-            <div>
-                <a href="${pageContext.request.contextPath}/login" style="margin-right: 12px; text-decoration: none; font-weight: 600; color: #007bff;">Đăng nhập</a>
-                <span>|</span>
-                <a href="${pageContext.request.contextPath}/register" style="margin-left: 12px; text-decoration: none; font-weight: 600; color: #28a745;">Đăng ký</a>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="${pageContext.request.contextPath}/login" style="display: inline-block; padding: 7px 16px; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">🔑 Đăng nhập</a>
+                <a href="${pageContext.request.contextPath}/register" style="display: inline-block; padding: 7px 16px; background: #28a745; color: #fff; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">📝 Đăng ký</a>
             </div>
         </c:when>
         <c:otherwise>
-            <div style="display: flex; align-items: center; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
                 <span style="color: #333; font-weight: 500;">
                     👤 Xin chào, <strong>${sessionScope.account.fullName}</strong> (${sessionScope.account.userName})
                 </span>
-                <span>|</span>
-                <a href="${pageContext.request.contextPath}/logout" style="text-decoration: none; color: #dc3545; font-weight: 600;">Đăng Xuất</a>
+                <a href="${pageContext.request.contextPath}/logout" style="padding: 6px 14px; background: #dc3545; color: #fff; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 13px;">Đăng Xuất</a>
             </div>
         </c:otherwise>
     </c:choose>

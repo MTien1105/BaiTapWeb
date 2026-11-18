@@ -163,15 +163,8 @@
                                     </c:if>
                                 </div>
                                 <div style="margin-top: 10px;">
-                                    <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="display: block; text-align: center; padding: 7px 12px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 13px; ${sessionScope.account != null ? 'background: #007bff; color: #fff;' : 'background: #fff3cd; color: #856404; border: 1px solid #ffeeba;'}">
-                                        <c:choose>
-                                            <c:when test="${sessionScope.account != null}">
-                                                ▶ Xem Video
-                                            </c:when>
-                                            <c:otherwise>
-                                                🔒 Đăng nhập để xem
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="display: block; text-align: center; padding: 7px 12px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 13px; background: #007bff; color: #fff;">
+                                        ▶ Xem Video
                                     </a>
                                 </div>
                             </div>
