@@ -14,7 +14,7 @@ Dự án Web Java Servlet - JSP áp dụng công nghệ **JPA (Hibernate)** đ�
 ---
 
 ## 🛠 Công nghệ sử dụng
-- **Ngôn ngữ**: Java 25 (LTS)
+- **Ngôn ngữ**: Java 21 (LTS)
 - **Công nghệ nền tảng**: Jakarta Servlet 6.0, Jakarta JSP 3.1, JSTL 3.0
 - **ORM / JPA**: Hibernate 6.4.4.Final / Jakarta Persistence API 3.1
 - **Cơ sở dữ liệu**: Microsoft SQL Server (kèm fallback H2 Database cho môi trường dev)
@@ -48,7 +48,7 @@ src/
 ## 🚀 Hướng dẫn khởi chạy
 
 1. **Yêu cầu môi trường**:
-   - JDK 25+
+   - JDK 21+
    - Apache Maven 3.9+
    - Apache Tomcat 10.1+ hoặc 11.0+
 
