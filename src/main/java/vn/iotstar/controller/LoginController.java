@@ -47,6 +47,17 @@ public class LoginController extends HttpServlet {
             }
         }
 
+        // Nhận tham số điều hướng sau đăng nhập nếu có
+        String redirect = req.getParameter("redirect");
+        if (redirect != null && !redirect.trim().isEmpty()) {
+            req.setAttribute("redirect", redirect.trim());
+        }
+
+        String alertParam = req.getParameter("alert");
+        if (alertParam != null && !alertParam.trim().isEmpty()) {
+            req.setAttribute("alert", alertParam.trim());
+        }
+
         // Lấy thông báo flashMessage từ session nếu có (ví dụ: sau khi kích hoạt hoặc đổi mật khẩu)
         if (session != null && session.getAttribute("flashMessage") != null) {
             req.setAttribute("message", session.getAttribute("flashMessage"));
@@ -65,7 +76,12 @@ public class LoginController extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         String remember = req.getParameter("remember");
+        String redirect = req.getParameter("redirect");
         boolean isRememberMe = (remember != null);
+
+        if (redirect != null && !redirect.trim().isEmpty()) {
+            req.setAttribute("redirect", redirect.trim());
+        }
 
         if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
             req.setAttribute("alert", "Tài khoản hoặc mật khẩu không được để trống!");
@@ -100,7 +116,11 @@ public class LoginController extends HttpServlet {
             saveRememberMe(resp, username.trim());
         }
 
-        resp.sendRedirect(req.getContextPath() + "/waiting");
+        if (redirect != null && !redirect.trim().isEmpty() && !redirect.contains("login") && !redirect.contains("logout")) {
+            resp.sendRedirect(redirect.trim());
+        } else {
+            resp.sendRedirect(req.getContextPath() + "/waiting");
+        }
     }
 
     private void saveRememberMe(HttpServletResponse response, String username) {

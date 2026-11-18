@@ -1,6 +1,8 @@
 package vn.iotstar.controller;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
@@ -18,7 +20,7 @@ import vn.iotstar.service.impl.VideoServiceImpl;
 import vn.iotstar.service.impl.UserServiceImpl;
 
 @SuppressWarnings("serial")
-@WebServlet(urlPatterns = { "/video" })
+@WebServlet(urlPatterns = { "/video", "/video/detail" })
 public class UserVideoController extends HttpServlet {
 
     private final IVideoService videoService = new VideoServiceImpl();
@@ -26,9 +28,48 @@ public class UserVideoController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String uri = req.getRequestURI();
         HttpSession session = req.getSession(false);
         User loggedInUser = (session != null) ? (User) session.getAttribute("account") : null;
 
+        // XỬ LÝ XEM CHI TIẾT VIDEO (/video/detail)
+        if (uri.contains("/video/detail")) {
+            String videoId = req.getParameter("id");
+            if (videoId == null || videoId.trim().isEmpty()) {
+                resp.sendRedirect(req.getContextPath() + "/video");
+                return;
+            }
+
+            // BẮT BUỘC ĐĂNG NHẬP MỚI ĐƯỢC VÀO XEM VIDEO
+            if (loggedInUser == null) {
+                String targetUrl = req.getContextPath() + "/video/detail?id=" + URLEncoder.encode(videoId.trim(), StandardCharsets.UTF_8);
+                String alertMsg = URLEncoder.encode("Bạn cần đăng nhập tài khoản để xem nội dung video này!", StandardCharsets.UTF_8);
+                resp.sendRedirect(req.getContextPath() + "/login?alert=" + alertMsg + "&redirect=" + URLEncoder.encode(targetUrl, StandardCharsets.UTF_8));
+                return;
+            }
+
+            // Đã đăng nhập -> Tải thông tin video và tăng lượt xem (Views + 1)
+            Video video = videoService.findById(videoId.trim());
+            if (video == null) {
+                resp.sendRedirect(req.getContextPath() + "/video");
+                return;
+            }
+
+            try {
+                video.setViews(video.getViews() + 1);
+                videoService.update(video);
+            } catch (Exception ignored) {
+            }
+
+            List<Video> relatedVideos = videoService.findTop10Latest();
+
+            req.setAttribute("video", video);
+            req.setAttribute("relatedVideos", relatedVideos);
+            req.getRequestDispatcher("/views/video-detail.jsp").forward(req, resp);
+            return;
+        }
+
+        // XỬ LÝ TRANG DANH SÁCH VIDEO (/video)
         // 1. Xác định User cần xem video (nếu có tham số ?userId= thì ưu tiên, nếu không thì lấy user đang đăng nhập)
         String userIdParam = req.getParameter("userId");
         Integer targetUserId = null;
@@ -46,7 +87,7 @@ public class UserVideoController extends HttpServlet {
             targetUserId = loggedInUser.getId();
         }
 
-        // 2. Phân trang 6 sản phẩm/trang theo đúng yêu cầu
+        // 2. Phân trang 6 sản phẩm/trang
         int pageSize = 6;
         int page = 1;
         String pageParam = req.getParameter("page");
@@ -69,7 +110,7 @@ public class UserVideoController extends HttpServlet {
             videoList = videoService.findByUserId(targetUserId, page, pageSize);
             totalVideos = videoService.countByUserId(targetUserId);
         } else {
-            // Trường hợp khách chưa đăng nhập và không chọn user -> xem tất cả video hoạt động
+            // Khách chưa đăng nhập và không chọn user -> xem tất cả video hoạt động
             videoList = videoService.findAllActivePaginated(page, pageSize);
             totalVideos = videoService.countActive();
         }
@@ -79,7 +120,6 @@ public class UserVideoController extends HttpServlet {
             totalPages = 1;
         }
 
-        // Đảm bảo không vượt quá tổng số trang nếu có dữ liệu
         if (page > totalPages && totalVideos > 0) {
             page = totalPages;
             if (targetUserId != null) {

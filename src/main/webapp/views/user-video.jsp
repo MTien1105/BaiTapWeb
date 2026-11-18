@@ -127,28 +127,32 @@
                 <div class="video-grid">
                     <c:forEach var="v" items="${videoList}">
                         <div class="video-card">
-                            <div class="video-thumbnail-box">
-                                <span class="badge-id">${v.videoId}</span>
-                                <c:choose>
-                                    <c:when test="${not empty v.poster}">
-                                        <c:choose>
-                                            <c:when test="${v.poster.startsWith('http')}">
-                                                <img src="${v.poster}" alt="${v.title}" onerror="this.src='https://placehold.co/400x225?text=Video+Image';">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <img src="${pageContext.request.contextPath}/uploads/${v.poster}" alt="${v.title}" onerror="this.src='https://placehold.co/400x225?text=Video+Image';">
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <img src="https://placehold.co/400x225?text=No+Poster" alt="${v.title}">
-                                    </c:otherwise>
-                                </c:choose>
-                                <span class="badge-views">👁️ ${v.views} views</span>
-                            </div>
+                            <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="text-decoration: none; color: inherit; display: block;">
+                                <div class="video-thumbnail-box">
+                                    <span class="badge-id">${v.videoId}</span>
+                                    <c:choose>
+                                        <c:when test="${not empty v.poster}">
+                                            <c:choose>
+                                                <c:when test="${v.poster.startsWith('http')}">
+                                                    <img src="${v.poster}" alt="${v.title}" onerror="this.src='https://placehold.co/400x225?text=Video+Image';">
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <img src="${pageContext.request.contextPath}/uploads/${v.poster}" alt="${v.title}" onerror="this.src='https://placehold.co/400x225?text=Video+Image';">
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="https://placehold.co/400x225?text=No+Poster" alt="${v.title}">
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <span class="badge-views">👁️ ${v.views} views</span>
+                                </div>
+                            </a>
 
                             <div class="video-body">
-                                <div class="video-title" title="${v.title}">${v.title}</div>
+                                <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="text-decoration: none; color: inherit;">
+                                    <div class="video-title" title="${v.title}">${v.title}</div>
+                                </a>
                                 <div class="video-desc" title="${v.description}">${v.description != null ? v.description : 'Không có mô tả chi tiết.'}</div>
                                 <div class="video-footer">
                                     <span class="uploader-info" title="Quan hệ 1-N: Video thuộc User ID ${v.user.id}">
@@ -157,6 +161,18 @@
                                     <c:if test="${sessionScope.account != null && sessionScope.account.id == v.user.id}">
                                         <a href="${pageContext.request.contextPath}/admin/video/edit?id=${v.videoId}" style="color: #ffc107; font-weight: 600; text-decoration: none;">✏️ Sửa</a>
                                     </c:if>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="display: block; text-align: center; padding: 7px 12px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 13px; ${sessionScope.account != null ? 'background: #007bff; color: #fff;' : 'background: #fff3cd; color: #856404; border: 1px solid #ffeeba;'}">
+                                        <c:choose>
+                                            <c:when test="${sessionScope.account != null}">
+                                                ▶ Xem Video
+                                            </c:when>
+                                            <c:otherwise>
+                                                🔒 Đăng nhập để xem
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </a>
                                 </div>
                             </div>
                         </div>

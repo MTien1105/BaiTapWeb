@@ -51,6 +51,9 @@
         </c:if>
 
         <form action="${pageContext.request.contextPath}/login" method="post">
+            <c:if test="${not empty redirect}">
+                <input type="hidden" name="redirect" value="${redirect}">
+            </c:if>
             <div class="form-group">
                 <label for="username">Tài khoản</label>
                 <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản" required autofocus>

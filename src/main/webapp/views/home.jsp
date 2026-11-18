@@ -110,34 +110,50 @@
                 <div class="video-grid">
                     <c:forEach var="v" items="${top10Videos}" varStatus="loop">
                         <div class="video-card">
-                            <div class="video-thumbnail-box">
-                                <span class="video-badge-new">#${loop.index + 1} MỚI</span>
-                                <c:choose>
-                                    <c:when test="${not empty v.poster}">
-                                        <c:choose>
-                                            <c:when test="${v.poster.startsWith('http')}">
-                                                <img src="${v.poster}" alt="${v.title}" onerror="this.src='https://placehold.co/400x225?text=Video+Image';">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <img src="${pageContext.request.contextPath}/uploads/${v.poster}" alt="${v.title}" onerror="this.src='https://placehold.co/400x225?text=Video+Image';">
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <img src="https://placehold.co/400x225?text=Video+HD" alt="${v.title}">
-                                    </c:otherwise>
-                                </c:choose>
-                                <span class="video-badge-views">👁️ ${v.views} lượt xem</span>
-                            </div>
+                            <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="text-decoration: none; color: inherit; display: block;">
+                                <div class="video-thumbnail-box">
+                                    <span class="video-badge-new">#${loop.index + 1} MỚI</span>
+                                    <c:choose>
+                                        <c:when test="${not empty v.poster}">
+                                            <c:choose>
+                                                <c:when test="${v.poster.startsWith('http')}">
+                                                    <img src="${v.poster}" alt="${v.title}" onerror="this.src='https://placehold.co/400x225?text=Video+Image';">
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <img src="${pageContext.request.contextPath}/uploads/${v.poster}" alt="${v.title}" onerror="this.src='https://placehold.co/400x225?text=Video+Image';">
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="https://placehold.co/400x225?text=Video+HD" alt="${v.title}">
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <span class="video-badge-views">👁️ ${v.views} lượt xem</span>
+                                </div>
+                            </a>
 
                             <div class="video-body">
-                                <div class="video-title" title="${v.title}">${v.title}</div>
+                                <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="text-decoration: none; color: inherit;">
+                                    <div class="video-title" title="${v.title}">${v.title}</div>
+                                </a>
                                 <div class="video-desc" title="${v.description}">${v.description != null ? v.description : 'Không có mô tả nội dung.'}</div>
                                 <div class="video-footer">
                                     <span class="uploader-tag" title="Mối quan hệ 1-N: Video thuộc về User ID ${v.user != null ? v.user.id : ''}">
                                         👤 ${v.user != null ? v.user.fullName : 'Hệ thống'}
                                     </span>
                                     <span style="color: #888; font-size: 11px;">Mã: ${v.videoId}</span>
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="display: block; text-align: center; padding: 8px 12px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 13px; ${sessionScope.account != null ? 'background: #007bff; color: #fff;' : 'background: #fff3cd; color: #856404; border: 1px solid #ffeeba;'}">
+                                        <c:choose>
+                                            <c:when test="${sessionScope.account != null}">
+                                                ▶ Xem Video Ngay
+                                            </c:when>
+                                            <c:otherwise>
+                                                🔒 Đăng nhập để xem
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </a>
                                 </div>
                             </div>
                         </div>
