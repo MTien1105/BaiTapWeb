@@ -108,6 +108,19 @@ public class VideoDaoImpl implements IVideoDao {
     }
 
     @Override
+    public List<Video> findTop10Latest() {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v WHERE v.active = 1 ORDER BY v.videoId DESC";
+            TypedQuery<Video> query = em.createQuery(jpql, Video.class);
+            query.setMaxResults(10);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public List<Video> searchByTitle(String keyword) {
         EntityManager em = JPAConfig.getEntityManager();
         try {

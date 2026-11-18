@@ -10,6 +10,7 @@ public interface IVideoDao {
     Video findById(String videoId);
     List<Video> findAll();
     List<Video> findAll(int page, int pageSize);
+    List<Video> findTop10Latest();
     List<Video> searchByTitle(String keyword);
     Video findByTitle(String title) throws Exception;
     int count();

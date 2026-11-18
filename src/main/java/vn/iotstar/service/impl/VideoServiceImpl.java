@@ -46,6 +46,11 @@ public class VideoServiceImpl implements IVideoService {
     }
 
     @Override
+    public List<Video> findTop10Latest() {
+        return videoDao.findTop10Latest();
+    }
+
+    @Override
     public List<Video> searchByTitle(String keyword) {
         return videoDao.searchByTitle(keyword);
     }

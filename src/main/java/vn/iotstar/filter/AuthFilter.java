@@ -19,7 +19,7 @@ import vn.iotstar.service.UserService;
 import vn.iotstar.service.impl.UserServiceImpl;
 import vn.iotstar.util.Constant;
 
-@WebFilter(urlPatterns = { "/home", "/admin/*" })
+@WebFilter(urlPatterns = { "/admin/*" })
 public class AuthFilter implements Filter {
 
     @Override
