@@ -9,6 +9,7 @@
     <persistence-unit name="jpa-hibernate-mysql" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>vn.iotstar.model.User</class>
+        <class>vn.iotstar.model.Video</class>
 
         <properties>
             <!-- Kết nối SQL Server - Mixed Mode (sa/123) -->
@@ -39,6 +40,7 @@
     <persistence-unit name="jpa-hibernate-h2" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>vn.iotstar.model.User</class>
+        <class>vn.iotstar.model.Video</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>

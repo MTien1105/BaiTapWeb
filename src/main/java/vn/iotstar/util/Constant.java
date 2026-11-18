@@ -8,6 +8,10 @@ public class Constant {
     public static final String VERIFY_CODE = "/views/verify-code.jsp";
     public static final String FORGOT_PASSWORD = "/views/forgot-password.jsp";
     public static final String RESET_PASSWORD = "/views/reset-password.jsp";
+    public static final String DIR = "D:/upload";
+    public static final String VIDEO_LIST = "/views/admin/video-list.jsp";
+    public static final String VIDEO_ADD = "/views/admin/video-add.jsp";
+    public static final String VIDEO_EDIT = "/views/admin/video-edit.jsp";
 
     public static class Path {
         public static final String REGISTER = "/views/register.jsp";
@@ -15,5 +19,8 @@ public class Constant {
         public static final String VERIFY_CODE = "/views/verify-code.jsp";
         public static final String FORGOT_PASSWORD = "/views/forgot-password.jsp";
         public static final String RESET_PASSWORD = "/views/reset-password.jsp";
+        public static final String VIDEO_LIST = "/views/admin/video-list.jsp";
+        public static final String VIDEO_ADD = "/views/admin/video-add.jsp";
+        public static final String VIDEO_EDIT = "/views/admin/video-edit.jsp";
     }
 }

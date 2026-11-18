@@ -68,7 +68,10 @@
                 </div>
             </div>
 
-            <a href="${pageContext.request.contextPath}/logout" class="btn-logout">Đăng Xuất</a>
+            <div style="margin-top: 20px; display: flex; gap: 12px;">
+                <a href="${pageContext.request.contextPath}/admin/videos" style="flex: 1; text-align: center; padding: 12px; background: #28a745; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">📺 Quản Lý Danh Sách Video (CRUD)</a>
+                <a href="${pageContext.request.contextPath}/logout" style="flex: 1; text-align: center; padding: 12px; background: #dc3545; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">Đăng Xuất</a>
+            </div>
         </c:if>
     </div>
 </body>

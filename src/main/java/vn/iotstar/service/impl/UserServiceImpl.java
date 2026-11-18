@@ -30,6 +30,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findById(int id) {
+        return userDao.findById(id);
+    }
+
+    @Override
+    public java.util.List<User> findAll() {
+        return userDao.findAll();
+    }
+
+    @Override
     public void insert(User user) {
         userDao.insert(user);
     }

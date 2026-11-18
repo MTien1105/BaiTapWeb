@@ -2,12 +2,17 @@ package vn.iotstar.model;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @SuppressWarnings("serial")
@@ -51,6 +56,35 @@ public class User implements Serializable {
 
     @Column(name = "code", length = 50)
     private String code; // Lưu mã xác thực OTP
+
+    // Mối quan hệ 1-N: 1 User có nhiều Videos
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Video> videos = new ArrayList<>();
+
+    public Video addVideo(Video video) {
+        if (videos == null) {
+            videos = new ArrayList<>();
+        }
+        videos.add(video);
+        video.setUser(this);
+        return video;
+    }
+
+    public Video removeVideo(Video video) {
+        if (videos != null) {
+            videos.remove(video);
+            video.setUser(null);
+        }
+        return video;
+    }
+
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
 
     public User() {
     }

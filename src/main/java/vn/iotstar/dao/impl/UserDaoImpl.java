@@ -66,6 +66,27 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
+    public User findById(int id) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            return em.find(User.class, id);
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<User> findAll() {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            TypedQuery<User> query = em.createNamedQuery("User.findAll", User.class);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public void insert(User user) {
         EntityManager em = JPAConfig.getEntityManager();
         EntityTransaction trans = em.getTransaction();

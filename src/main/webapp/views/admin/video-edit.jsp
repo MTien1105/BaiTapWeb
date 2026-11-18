@@ -1,0 +1,114 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Cập Nhật Video (JPA Entity Video)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f0f2f5; }
+        .container { max-width: 650px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h2 { color: #ffc107; margin-bottom: 8px; text-align: center; font-size: 22px; color: #d39e00; }
+        .subtitle { text-align: center; color: #6c757d; font-size: 13px; margin-bottom: 24px; }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; color: #333; font-size: 14px; }
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 14px; outline: none;
+        }
+        input:focus, textarea:focus, select:focus { border-color: #ffc107; box-shadow: 0 0 0 2px rgba(255,193,7,0.25); }
+        .btn-group { display: flex; gap: 12px; margin-top: 24px; }
+        .btn { flex: 1; padding: 12px; border-radius: 4px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; border: none; font-size: 15px; }
+        .btn-update { background: #ffc107; color: #212529; }
+        .btn-update:hover { background: #e0a800; }
+        .btn-cancel { background: #6c757d; color: #fff; }
+        .btn-cancel:hover { background: #5a6268; }
+        .hint { font-size: 12px; color: #888; margin-top: 4px; }
+        .current-poster { margin-top: 8px; display: flex; align-items: center; gap: 12px; }
+        .current-poster img { width: 120px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6; }
+        .relation-box { background: #e7f3fe; border: 1px solid #b8daff; border-radius: 6px; padding: 12px; margin-bottom: 18px; }
+        .relation-box label { color: #004085; }
+    </style>
+</head>
+<body>
+    <jsp:include page="/views/topbar.jsp" />
+
+    <div class="container">
+        <h2>✏️ CẬP NHẬT THÔNG TIN VIDEO</h2>
+        <p class="subtitle">Chỉnh sửa thông tin video và cập nhật liên kết sở hữu với tài khoản Users</p>
+
+        <form action="${pageContext.request.contextPath}/admin/video/update" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="videoId">Mã Video (Khóa chính - Không đổi):</label>
+                <input type="text" id="videoId" name="videoId" value="${video.videoId}" readonly style="background-color: #e9ecef; cursor: not-allowed;">
+            </div>
+
+            <div class="form-group">
+                <label for="title">Tiêu Đề Video <span style="color: red;">*</span>:</label>
+                <input type="text" id="title" name="title" value="${video.title}" required placeholder="Nhập tên / tiêu đề video...">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Mô Tả Chi Tiết:</label>
+                <textarea id="description" name="description" rows="3" placeholder="Nhập mô tả nội dung video...">${video.description}</textarea>
+            </div>
+
+            <div class="relation-box">
+                <label for="userId">🔗 Người Đăng / Sở Hữu Video (Quan hệ 1 - N với Users) <span style="color: red;">*</span>:</label>
+                <select id="userId" name="userId" required>
+                    <c:forEach var="u" items="${userList}">
+                        <option value="${u.id}" ${video.user != null && video.user.id == u.id ? 'selected' : ''}>
+                            👤 ${u.fullName} (Username: ${u.userName} | Email: ${u.email})
+                        </option>
+                    </c:forEach>
+                </select>
+                <div class="hint" style="color: #004085; margin-top: 5px;">Mỗi video bắt buộc thuộc về 1 User trong CSDL.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="posterUrl">Hình Ảnh Poster (URL):</label>
+                <input type="text" id="posterUrl" name="posterUrl" value="${video.poster}" placeholder="https://example.com/image.jpg">
+                <c:if test="${not empty video.poster}">
+                    <div class="current-poster">
+                        <span style="font-size: 13px; color: #555;">Poster hiện tại:</span>
+                        <c:choose>
+                            <c:when test="${video.poster.startsWith('http')}">
+                                <img src="${video.poster}" alt="Current Poster" onerror="this.src='https://placehold.co/120x70?text=No+Image';">
+                            </c:when>
+                            <c:otherwise>
+                                <img src="${pageContext.request.contextPath}/uploads/${video.poster}" alt="Current Poster" onerror="this.src='https://placehold.co/120x70?text=No+Image';">
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </c:if>
+            </div>
+
+            <div class="form-group">
+                <label for="posterFile">Hoặc Tải Lên Ảnh Poster Mới:</label>
+                <input type="file" id="posterFile" name="posterFile" accept="image/*">
+                <div class="hint">Bỏ trống nếu muốn giữ nguyên ảnh hiện tại.</div>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;">
+                    <label for="views">Lượt Xem (Views):</label>
+                    <input type="number" id="views" name="views" value="${video.views}" min="0">
+                </div>
+
+                <div class="form-group" style="flex: 1;">
+                    <label for="active">Trạng Thái:</label>
+                    <select id="active" name="active">
+                        <option value="1" ${video.active == 1 ? 'selected' : ''}>✅ Hoạt động (Hiển thị)</option>
+                        <option value="0" ${video.active == 0 ? 'selected' : ''}>❌ Tạm ẩn</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-update">Cập Nhật Video</button>
+                <a href="${pageContext.request.contextPath}/admin/videos" class="btn btn-cancel">Hủy Bỏ</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
