@@ -51,6 +51,16 @@ public class VideoServiceImpl implements IVideoService {
     }
 
     @Override
+    public List<Video> findByUserId(int userId) {
+        return videoDao.findByUserId(userId);
+    }
+
+    @Override
+    public List<Video> searchByTitleAndUserId(String keyword, int userId) {
+        return videoDao.searchByTitleAndUserId(keyword, userId);
+    }
+
+    @Override
     public List<Video> findByUserId(int userId, int page, int pageSize) {
         return videoDao.findByUserId(userId, page, pageSize);
     }

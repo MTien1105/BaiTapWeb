@@ -2,6 +2,8 @@ package vn.iotstar.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -41,36 +43,101 @@ public class VideoController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uri = req.getRequestURI();
+        HttpSession session = req.getSession(false);
+        User loggedInUser = (session != null) ? (User) session.getAttribute("account") : null;
+
+        // BẮT BUỘC ĐĂNG NHẬP MỚI ĐƯỢC VÀO QUẢN LÝ VIDEO
+        if (loggedInUser == null) {
+            String alertMsg = URLEncoder.encode("Vui lòng đăng nhập để quản lý video!", StandardCharsets.UTF_8);
+            resp.sendRedirect(req.getContextPath() + "/login?alert=" + alertMsg);
+            return;
+        }
+
+        boolean isAdmin = (loggedInUser.getRoleid() == 1);
+        req.setAttribute("isAdmin", isAdmin);
+
+        // Lấy và xóa flash message nếu có
+        if (session.getAttribute("flashError") != null) {
+            req.setAttribute("flashError", session.getAttribute("flashError"));
+            session.removeAttribute("flashError");
+        }
+        if (session.getAttribute("flashMessage") != null) {
+            req.setAttribute("flashMessage", session.getAttribute("flashMessage"));
+            session.removeAttribute("flashMessage");
+        }
 
         if (uri.contains("/admin/video/add")) {
-            List<User> userList = userService.findAll();
-            req.setAttribute("userList", userList);
+            if (isAdmin) {
+                List<User> userList = userService.findAll();
+                req.setAttribute("userList", userList);
+            }
             req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+
         } else if (uri.contains("/admin/video/edit")) {
             String videoId = req.getParameter("id");
             Video video = videoService.findById(videoId);
-            List<User> userList = userService.findAll();
+            if (video == null) {
+                session.setAttribute("flashError", "Không tìm thấy video cần sửa!");
+                resp.sendRedirect(req.getContextPath() + "/admin/videos");
+                return;
+            }
+
+            // KIỂM TRA QUYỀN HẠN: Chỉ Admin hoặc chính chủ video mới được sửa!
+            if (!isAdmin && (video.getUser() == null || video.getUser().getId() != loggedInUser.getId())) {
+                session.setAttribute("flashError", "Bạn chỉ được phép chỉnh sửa video do chính bạn tạo!");
+                resp.sendRedirect(req.getContextPath() + "/admin/videos");
+                return;
+            }
+
+            if (isAdmin) {
+                List<User> userList = userService.findAll();
+                req.setAttribute("userList", userList);
+            }
             req.setAttribute("video", video);
-            req.setAttribute("userList", userList);
             req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+
         } else if (uri.contains("/admin/video/delete")) {
             String videoId = req.getParameter("id");
-            try {
-                videoService.delete(videoId);
-            } catch (Exception e) {
-                e.printStackTrace();
+            Video video = videoService.findById(videoId);
+            if (video != null) {
+                // KIỂM TRA QUYỀN HẠN: Chỉ Admin hoặc chính chủ video mới được xóa!
+                if (!isAdmin && (video.getUser() == null || video.getUser().getId() != loggedInUser.getId())) {
+                    session.setAttribute("flashError", "Bạn chỉ được phép xóa video do chính bạn tạo!");
+                    resp.sendRedirect(req.getContextPath() + "/admin/videos");
+                    return;
+                }
+                try {
+                    videoService.delete(videoId);
+                    session.setAttribute("flashMessage", "Đã xóa video " + videoId + " thành công!");
+                } catch (Exception e) {
+                    session.setAttribute("flashError", "Không thể xóa video: " + e.getMessage());
+                }
             }
             resp.sendRedirect(req.getContextPath() + "/admin/videos");
+
         } else {
-            // Danh sách Video (/admin/videos hoặc /videos)
+            // DANH SÁCH VIDEO (/admin/videos hoặc /videos)
             String keyword = req.getParameter("keyword");
             List<Video> list;
-            if (keyword != null && !keyword.trim().isEmpty()) {
-                list = videoService.searchByTitle(keyword.trim());
-                req.setAttribute("keyword", keyword.trim());
+
+            if (isAdmin) {
+                // Admin xem được tất cả video của toàn hệ thống
+                if (keyword != null && !keyword.trim().isEmpty()) {
+                    list = videoService.searchByTitle(keyword.trim());
+                    req.setAttribute("keyword", keyword.trim());
+                } else {
+                    list = videoService.findAll();
+                }
             } else {
-                list = videoService.findAll();
+                // User thường (như user 'tin') CHỈ XEM VIDEO CỦA CHÍNH MÌNH
+                if (keyword != null && !keyword.trim().isEmpty()) {
+                    list = videoService.searchByTitleAndUserId(keyword.trim(), loggedInUser.getId());
+                    req.setAttribute("keyword", keyword.trim());
+                } else {
+                    list = videoService.findByUserId(loggedInUser.getId());
+                }
             }
+
             req.setAttribute("videoList", list);
             req.getRequestDispatcher(Constant.Path.VIDEO_LIST).forward(req, resp);
         }
@@ -79,6 +146,15 @@ public class VideoController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String uri = req.getRequestURI();
+        HttpSession session = req.getSession(false);
+        User loggedInUser = (session != null) ? (User) session.getAttribute("account") : null;
+
+        if (loggedInUser == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
+
+        boolean isAdmin = (loggedInUser.getRoleid() == 1);
 
         if (uri.contains("/admin/video/insert")) {
             String videoId = req.getParameter("videoId");
@@ -97,36 +173,28 @@ public class VideoController extends HttpServlet {
             } catch (Exception ignored) {
             }
 
-            int userId = 0;
-            try {
-                userId = Integer.parseInt(req.getParameter("userId"));
-            } catch (Exception ignored) {
+            // Xác định User sở hữu video:
+            // Admin có thể chọn user khác; User thường luôn gán cho chính mình!
+            User owner = loggedInUser;
+            if (isAdmin) {
+                try {
+                    int chosenUserId = Integer.parseInt(req.getParameter("userId"));
+                    if (chosenUserId > 0) {
+                        User chosenUser = userService.findById(chosenUserId);
+                        if (chosenUser != null) {
+                            owner = chosenUser;
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
             }
 
-            // Xử lý upload ảnh poster hoặc dùng link URL
             String poster = handlePosterUpload(req, posterUrl);
 
-            // Tìm đối tượng User chủ sở hữu video (mối quan hệ 1-N)
-            User user = null;
-            if (userId > 0) {
-                user = userService.findById(userId);
-            }
-            if (user == null) {
-                HttpSession session = req.getSession(false);
-                if (session != null && session.getAttribute("account") != null) {
-                    user = (User) session.getAttribute("account");
-                }
-            }
-            if (user == null) {
-                List<User> allUsers = userService.findAll();
-                if (!allUsers.isEmpty()) {
-                    user = allUsers.get(0);
-                }
-            }
-
-            Video video = new Video(videoId, title, description, poster, views, active, user);
+            Video video = new Video(videoId, title, description, poster, views, active, owner);
             videoService.insert(video);
 
+            session.setAttribute("flashMessage", "Đã thêm video mới thành công!");
             resp.sendRedirect(req.getContextPath() + "/admin/videos");
 
         } else if (uri.contains("/admin/video/update")) {
@@ -146,24 +214,44 @@ public class VideoController extends HttpServlet {
             } catch (Exception ignored) {
             }
 
-            int userId = 0;
-            try {
-                userId = Integer.parseInt(req.getParameter("userId"));
-            } catch (Exception ignored) {
+            Video existing = videoService.findById(videoId);
+            if (existing == null) {
+                session.setAttribute("flashError", "Không tìm thấy video để cập nhật!");
+                resp.sendRedirect(req.getContextPath() + "/admin/videos");
+                return;
             }
 
-            Video existing = videoService.findById(videoId);
+            // KIỂM TRA QUYỀN HẠN: Chỉ Admin hoặc chính chủ video mới được sửa!
+            if (!isAdmin && (existing.getUser() == null || existing.getUser().getId() != loggedInUser.getId())) {
+                session.setAttribute("flashError", "Bạn chỉ được phép cập nhật video của chính bạn!");
+                resp.sendRedirect(req.getContextPath() + "/admin/videos");
+                return;
+            }
 
             String poster = handlePosterUpload(req, posterUrl);
             if ((poster == null || poster.trim().isEmpty()) && existing != null) {
                 poster = existing.getPoster();
             }
 
-            User user = (userId > 0) ? userService.findById(userId) : (existing != null ? existing.getUser() : null);
+            // Quyền sở hữu:
+            User owner = existing.getUser();
+            if (isAdmin) {
+                try {
+                    int chosenUserId = Integer.parseInt(req.getParameter("userId"));
+                    if (chosenUserId > 0) {
+                        User chosenUser = userService.findById(chosenUserId);
+                        if (chosenUser != null) {
+                            owner = chosenUser;
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
 
-            Video video = new Video(videoId, title, description, poster, views, active, user);
+            Video video = new Video(videoId, title, description, poster, views, active, owner);
             videoService.update(video);
 
+            session.setAttribute("flashMessage", "Đã cập nhật video " + videoId + " thành công!");
             resp.sendRedirect(req.getContextPath() + "/admin/videos");
         }
     }
@@ -181,7 +269,6 @@ public class VideoController extends HttpServlet {
                     }
                     String fileName = System.currentTimeMillis() + ext;
 
-                    // Lưu vào thư mục /uploads của webapp để truy cập trực tiếp
                     String uploadPath = req.getServletContext().getRealPath("/uploads");
                     File uploadDir = new File(uploadPath);
                     if (!uploadDir.exists()) {
@@ -189,7 +276,6 @@ public class VideoController extends HttpServlet {
                     }
                     part.write(uploadPath + File.separator + fileName);
 
-                    // Đồng thời lưu vào D:/upload nếu có thể
                     try {
                         File backupDir = new File(Constant.DIR);
                         if (!backupDir.exists()) {

@@ -121,6 +121,33 @@ public class VideoDaoImpl implements IVideoDao {
     }
 
     @Override
+    public List<Video> findByUserId(int userId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v WHERE v.user.id = :userId ORDER BY v.videoId DESC";
+            TypedQuery<Video> query = em.createQuery(jpql, Video.class);
+            query.setParameter("userId", userId);
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public List<Video> searchByTitleAndUserId(String keyword, int userId) {
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT v FROM Video v WHERE v.user.id = :userId AND LOWER(v.title) LIKE LOWER(:keyword) ORDER BY v.videoId DESC";
+            TypedQuery<Video> query = em.createQuery(jpql, Video.class);
+            query.setParameter("userId", userId);
+            query.setParameter("keyword", "%" + keyword + "%");
+            return query.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
     public List<Video> findByUserId(int userId, int page, int pageSize) {
         EntityManager em = JPAConfig.getEntityManager();
         try {

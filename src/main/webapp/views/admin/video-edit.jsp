@@ -54,15 +54,26 @@
             </div>
 
             <div class="relation-box">
-                <label for="userId">🔗 Người Đăng / Sở Hữu Video (Quan hệ 1 - N với Users) <span style="color: red;">*</span>:</label>
-                <select id="userId" name="userId" required>
-                    <c:forEach var="u" items="${userList}">
-                        <option value="${u.id}" ${video.user != null && video.user.id == u.id ? 'selected' : ''}>
-                            👤 ${u.fullName} (Username: ${u.userName} | Email: ${u.email})
-                        </option>
-                    </c:forEach>
-                </select>
-                <div class="hint" style="color: #004085; margin-top: 5px;">Mỗi video bắt buộc thuộc về 1 User trong CSDL.</div>
+                <label>🔗 Người Đăng / Sở Hữu Video (Quan hệ 1 - N với Users):</label>
+                <c:choose>
+                    <c:when test="${isAdmin}">
+                        <select id="userId" name="userId" required>
+                            <c:forEach var="u" items="${userList}">
+                                <option value="${u.id}" ${video.user != null && video.user.id == u.id ? 'selected' : ''}>
+                                    👤 ${u.fullName} (Username: ${u.userName} | Email: ${u.email})
+                                </option>
+                            </c:forEach>
+                        </select>
+                        <div class="hint" style="color: #004085; margin-top: 5px;">(Admin) Bạn có quyền đổi chủ sở hữu video.</div>
+                    </c:when>
+                    <c:otherwise>
+                        <div style="padding: 10px; background: #fff; border: 1px solid #ced4da; border-radius: 4px; font-weight: 600; color: #155724;">
+                            👤 ${video.user != null ? video.user.fullName : sessionScope.account.fullName} (${video.user != null ? video.user.userName : sessionScope.account.userName})
+                        </div>
+                        <input type="hidden" name="userId" value="${video.user != null ? video.user.id : sessionScope.account.id}">
+                        <div class="hint" style="color: #004085; margin-top: 5px;">Bạn chỉ có quyền chỉnh sửa video do chính bạn sở hữu.</div>
+                    </c:otherwise>
+                </c:choose>
             </div>
 
             <div class="form-group">

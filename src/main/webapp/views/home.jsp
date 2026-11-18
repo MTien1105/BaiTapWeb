@@ -74,7 +74,12 @@
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <a href="${pageContext.request.contextPath}/video" style="display: inline-block; padding: 10px 18px; background: #007bff; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">🎬 Video Của Tôi (/video)</a>
-                    <a href="${pageContext.request.contextPath}/admin/videos" class="btn-manage-video">📺 Quản Lý Video (CRUD)</a>
+                    <a href="${pageContext.request.contextPath}/admin/videos" class="btn-manage-video">
+                        <c:choose>
+                            <c:when test="${sessionScope.account.roleid == 1}">📺 Quản Lý Toàn Bộ Video (Admin)</c:when>
+                            <c:otherwise>📺 Quản Lý Video Của Tôi</c:otherwise>
+                        </c:choose>
+                    </a>
                 </div>
             </div>
         </c:if>

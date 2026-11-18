@@ -5,7 +5,14 @@
         <a href="${pageContext.request.contextPath}/home" style="text-decoration: none; font-weight: bold; color: #007bff; font-size: 18px;">🔐 JPA SYSTEM</a>
         <a href="${pageContext.request.contextPath}/video" style="text-decoration: none; font-weight: 600; color: #007bff; font-size: 14px; padding: 5px 12px; background: #e7f3fe; border: 1px solid #b8daff; border-radius: 4px;">🎬 Video Của User (/video)</a>
         <c:if test="${sessionScope.account != null}">
-            <a href="${pageContext.request.contextPath}/admin/videos" style="text-decoration: none; font-weight: 600; color: #28a745; font-size: 14px; padding: 5px 12px; background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 4px;">📺 Quản Lý Video (CRUD)</a>
+            <c:choose>
+                <c:when test="${sessionScope.account.roleid == 1}">
+                    <a href="${pageContext.request.contextPath}/admin/videos" style="text-decoration: none; font-weight: 600; color: #28a745; font-size: 14px; padding: 5px 12px; background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 4px;">📺 Quản Lý Tất Cả Video (Admin)</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/admin/videos" style="text-decoration: none; font-weight: 600; color: #28a745; font-size: 14px; padding: 5px 12px; background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 4px;">📺 Quản Lý Video Của Tôi</a>
+                </c:otherwise>
+            </c:choose>
         </c:if>
     </div>
     <c:choose>

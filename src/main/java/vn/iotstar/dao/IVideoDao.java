@@ -11,11 +11,13 @@ public interface IVideoDao {
     List<Video> findAll();
     List<Video> findAll(int page, int pageSize);
     List<Video> findTop10Latest();
+    List<Video> findByUserId(int userId);
     List<Video> findByUserId(int userId, int page, int pageSize);
     int countByUserId(int userId);
     List<Video> findAllActivePaginated(int page, int pageSize);
     int countActive();
     List<Video> searchByTitle(String keyword);
+    List<Video> searchByTitleAndUserId(String keyword, int userId);
     Video findByTitle(String title) throws Exception;
     int count();
 }

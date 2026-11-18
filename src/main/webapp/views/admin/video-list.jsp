@@ -4,7 +4,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản Lý Danh Sách Video (JPA CRUD)</title>
+    <title>Quản Lý Video (Phân Quyền CRUD Theo User)</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #f0f2f5; }
@@ -33,42 +33,82 @@
         .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
         .badge-active { background: #d4edda; color: #155724; }
         .badge-inactive { background: #f8d7da; color: #721c24; }
+        .badge-role { background: #e7f3fe; color: #0056b3; padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 12px; }
         .user-tag { background: #e7f1ff; color: #004085; padding: 3px 8px; border-radius: 4px; font-weight: 500; font-size: 13px; }
-        .empty-msg { text-align: center; padding: 40px; color: #6c757d; font-style: italic; }
+        .user-tag-me { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .empty-msg { text-align: center; padding: 40px; color: #6c757d; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 12px 16px; border-radius: 6px; margin-bottom: 18px; font-size: 14px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 12px 16px; border-radius: 6px; margin-bottom: 18px; font-size: 14px; }
     </style>
 </head>
 <body>
     <jsp:include page="/views/topbar.jsp" />
 
     <div class="container">
+        <!-- Thông báo lỗi hoặc thành công nếu có -->
+        <c:if test="${not empty flashError}">
+            <div class="alert-error">⚠️ ${flashError}</div>
+        </c:if>
+        <c:if test="${not empty flashMessage}">
+            <div class="alert-success">✅ ${flashMessage}</div>
+        </c:if>
+
         <div class="header-section">
             <div class="header-title">
-                <h2>📺 QUẢN LÝ VIDEO (JPA CRUD & QUAN HỆ 1-N VỚI USERS)</h2>
-                <p>Thực hiện các thao tác Thêm, Sửa, Xóa và Tìm kiếm Video với Hibernate 6.x & Jakarta EE 10</p>
+                <h2>
+                    🎬 
+                    <c:choose>
+                        <c:when test="${isAdmin}">
+                            QUẢN LÝ TẤT CẢ VIDEO HỆ THỐNG <span class="badge-role">QUYỀN ADMIN</span>
+                        </c:when>
+                        <c:otherwise>
+                            QUẢN LÝ VIDEO CỦA TÔI: <strong>${sessionScope.account.fullName}</strong> (${sessionScope.account.userName})
+                        </c:otherwise>
+                    </c:choose>
+                </h2>
+                <p>
+                    <c:choose>
+                        <c:when test="${isAdmin}">
+                            Bạn đang đăng nhập với tư cách Quản trị viên (Admin) — được phép xem, thêm, sửa, xóa toàn bộ video của tất cả người dùng.
+                        </c:when>
+                        <c:otherwise>
+                            🔒 <strong>Quy định bảo mật:</strong> Mỗi người dùng chỉ có quyền Xem, Thêm, Chỉnh sửa và Xóa video do chính mình tạo ra!
+                        </c:otherwise>
+                    </c:choose>
+                </p>
             </div>
             <div>
-                <a href="${pageContext.request.contextPath}/admin/video/add" class="btn btn-success">+ Thêm Video Mới</a>
+                <a href="${pageContext.request.contextPath}/admin/video/add" class="btn btn-success">+ Đăng Video Mới</a>
             </div>
         </div>
 
         <div class="actions-bar">
             <form action="${pageContext.request.contextPath}/admin/videos" method="get" class="search-box">
-                <input type="text" name="keyword" placeholder="Nhập tiêu đề video cần tìm..." value="${keyword}">
+                <input type="text" name="keyword" placeholder="Nhập tiêu đề video của bạn..." value="${keyword}">
                 <button type="submit" class="btn btn-primary">Tìm kiếm</button>
                 <c:if test="${not empty keyword}">
                     <a href="${pageContext.request.contextPath}/admin/videos" class="btn btn-warning">Xem tất cả</a>
                 </c:if>
             </form>
             <div>
-                <span>Tổng số: <strong>${videoList.size()}</strong> video</span>
+                <span>Số lượng: <strong>${videoList != null ? videoList.size() : 0}</strong> video</span>
             </div>
         </div>
 
         <c:choose>
             <c:when test="${empty videoList}">
                 <div class="empty-msg">
-                    <p>Chưa có video nào trong hệ thống hoặc không tìm thấy video phù hợp!</p>
-                    <a href="${pageContext.request.contextPath}/admin/video/add" class="btn btn-primary" style="margin-top: 15px;">Thêm video đầu tiên ngay</a>
+                    <p style="font-size: 16px; margin-bottom: 12px;">
+                        <c:choose>
+                            <c:when test="${isAdmin}">
+                                Chưa có video nào trong toàn bộ hệ thống!
+                            </c:when>
+                            <c:otherwise>
+                                Bạn (${sessionScope.account.userName}) hiện chưa đăng video nào!
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
+                    <a href="${pageContext.request.contextPath}/admin/video/add" class="btn btn-success">+ Đăng video đầu tiên của bạn ngay</a>
                 </div>
             </c:when>
             <c:otherwise>
@@ -78,10 +118,10 @@
                             <th style="width: 80px;">Mã Video</th>
                             <th style="width: 100px;">Hình ảnh</th>
                             <th>Tiêu đề & Mô tả</th>
-                            <th style="width: 100px;">Lượt xem</th>
-                            <th style="width: 110px;">Trạng thái</th>
-                            <th style="width: 170px;">Người đăng (1-N)</th>
-                            <th style="width: 140px; text-align: center;">Hành động</th>
+                            <th style="width: 90px;">Lượt xem</th>
+                            <th style="width: 100px;">Trạng thái</th>
+                            <th style="width: 160px;">Chủ sở hữu (1-N)</th>
+                            <th style="width: 140px; text-align: center;">Thao tác CRUD</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,7 +146,11 @@
                                     </c:choose>
                                 </td>
                                 <td>
-                                    <div style="font-weight: 600; color: #212529; margin-bottom: 4px;">${item.title}</div>
+                                    <div style="font-weight: 600; color: #212529; margin-bottom: 4px;">
+                                        <a href="${pageContext.request.contextPath}/video/detail?id=${item.videoId}" style="text-decoration: none; color: inherit;" title="Xem chi tiết và phát video">
+                                            ${item.title}
+                                        </a>
+                                    </div>
                                     <div style="color: #6c757d; font-size: 13px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                         ${item.description != null ? item.description : 'Chưa có mô tả'}
                                     </div>
@@ -125,8 +169,11 @@
                                 <td>
                                     <c:choose>
                                         <c:when test="${item.user != null}">
-                                            <span class="user-tag" title="User ID: ${item.user.id}">
-                                                👤 ${item.user.fullName} (${item.user.userName})
+                                            <span class="user-tag ${sessionScope.account != null && sessionScope.account.id == item.user.id ? 'user-tag-me' : ''}">
+                                                👤 ${item.user.fullName}
+                                                <c:if test="${sessionScope.account != null && sessionScope.account.id == item.user.id}">
+                                                    <strong>(Tôi)</strong>
+                                                </c:if>
                                             </span>
                                         </c:when>
                                         <c:otherwise>
@@ -135,8 +182,15 @@
                                     </c:choose>
                                 </td>
                                 <td style="text-align: center;">
-                                    <a href="${pageContext.request.contextPath}/admin/video/edit?id=${item.videoId}" class="btn btn-warning btn-sm">Sửa</a>
-                                    <a href="${pageContext.request.contextPath}/admin/video/delete?id=${item.videoId}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa video này?');">Xóa</a>
+                                    <c:choose>
+                                        <c:when test="${isAdmin || (sessionScope.account != null && item.user != null && item.user.id == sessionScope.account.id)}">
+                                            <a href="${pageContext.request.contextPath}/admin/video/edit?id=${item.videoId}" class="btn btn-warning btn-sm">✏️ Sửa</a>
+                                            <a href="${pageContext.request.contextPath}/admin/video/delete?id=${item.videoId}" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa video này không?');">🗑️ Xóa</a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span style="color: #999; font-size: 12px; font-style: italic;">Không có quyền</span>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </td>
                             </tr>
                         </c:forEach>
