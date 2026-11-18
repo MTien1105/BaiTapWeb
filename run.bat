@@ -13,7 +13,8 @@ if errorlevel 1 (
 )
 
 echo [2/3] Sao chep file WAR vao Apache Tomcat 11...
-copy /Y "%~dp0target\ShoppingServletServiceMVC.war" "C:\apache-tomcat-11.0.27\webapps\"
+copy /Y "%~dp0target\ShoppingServletServiceMVC.war" "C:\apache-tomcat-11.0.27\webapps\ShoppingServletServiceMVC.war"
+copy /Y "%~dp0target\ShoppingServletServiceMVC.war" "C:\apache-tomcat-11.0.27\webapps\ROOT.war"
 if errorlevel 1 (
     echo [Loi] Khong the copy vao C:\apache-tomcat-11.0.27\webapps\
     echo Vui long chuot phai vao file run.bat va chon "Run as administrator"!
@@ -35,6 +36,6 @@ echo   Dang tu dong mo trinh duyet...
 echo ========================================================
 
 timeout /t 3 /nobreak > nul
-start http://localhost:8080/ShoppingServletServiceMVC/login
+start http://localhost:8080/home
 
 exit
