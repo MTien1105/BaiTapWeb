@@ -38,7 +38,9 @@
         .badge-id { position: absolute; top: 8px; left: 8px; background: rgba(0,123,255,0.85); color: #fff; font-size: 11px; font-weight: bold; padding: 3px 7px; border-radius: 3px; }
 
         .video-body { padding: 16px; display: flex; flex-direction: column; flex: 1; }
-        .video-title { font-size: 16px; font-weight: 600; color: #212529; margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 44px; }
+        .video-title { font-size: 16px; font-weight: 600; color: #212529; margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 44px; transition: color 0.2s; }
+        .video-title-link { text-decoration: none; color: inherit; display: block; }
+        .video-title-link:hover .video-title { color: #007bff; text-decoration: underline; cursor: pointer; }
         .video-desc { font-size: 13px; color: #6c757d; margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex: 1; line-height: 1.4; }
 
         .video-footer { border-top: 1px solid #f1f1f1; padding-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; }
@@ -150,8 +152,8 @@
                             </a>
 
                             <div class="video-body">
-                                <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="text-decoration: none; color: inherit;">
-                                    <div class="video-title" title="${v.title}">${v.title}</div>
+                                <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" class="video-title-link" title="Bấm vào tiêu đề để xem chi tiết và phát video">
+                                    <div class="video-title">▶ ${v.title}</div>
                                 </a>
                                 <div class="video-desc" title="${v.description}">${v.description != null ? v.description : 'Không có mô tả chi tiết.'}</div>
                                 <div class="video-footer">
@@ -164,7 +166,7 @@
                                 </div>
                                 <div style="margin-top: 10px;">
                                     <a href="${pageContext.request.contextPath}/video/detail?id=${v.videoId}" style="display: block; text-align: center; padding: 7px 12px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 13px; background: #007bff; color: #fff;">
-                                        ▶ Xem Video
+                                        🎬 Xem Chi Tiết & Play
                                     </a>
                                 </div>
                             </div>
