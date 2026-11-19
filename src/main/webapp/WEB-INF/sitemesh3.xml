@@ -1,10 +1,18 @@
 <sitemesh>
 
+    <!-- Khai báo Decorator cho khu vực Người dùng chung (/*) -->
     <mapping path="/*" name="web" decorator="web.jsp" />
 
+    <!-- Khai báo Decorator cho khu vực Quản trị (/admin/*) -->
     <mapping path="/admin/*" name="admin" decorator="admin.jsp" />
 
-    <!-- Exclude path from decoration. -->
+    <!-- Exclude path from decoration: Ngăn chặn đệ quy decorator và tài nguyên tĩnh -->
     <mapping path="/api*" exclude="true" />
+    <mapping path="/common/*" exclude="true" />
+    <mapping path="/commons/*" exclude="true" />
+    <mapping path="/decorators/*" exclude="true" />
+    <mapping path="/uploads/*" exclude="true" />
+    <mapping path="/static/*" exclude="true" />
+    <mapping path="/assets/*" exclude="true" />
 
 </sitemesh>

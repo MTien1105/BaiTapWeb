@@ -12,7 +12,10 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo [2/3] Sao chep file WAR vao Apache Tomcat 11...
+echo [2/3] Don dep va Sao chep file WAR vao Apache Tomcat 11...
+rd /s /q "C:\apache-tomcat-11.0.27\webapps\ROOT" 2>nul
+rd /s /q "C:\apache-tomcat-11.0.27\webapps\ShoppingServletServiceMVC" 2>nul
+
 copy /Y "%~dp0target\ShoppingServletServiceMVC.war" "C:\apache-tomcat-11.0.27\webapps\ShoppingServletServiceMVC.war"
 copy /Y "%~dp0target\ShoppingServletServiceMVC.war" "C:\apache-tomcat-11.0.27\webapps\ROOT.war"
 if errorlevel 1 (
@@ -35,7 +38,7 @@ echo   Tomcat da khoi dong thanh cong!
 echo   Dang tu dong mo trinh duyet...
 echo ========================================================
 
-timeout /t 3 /nobreak > nul
+timeout /t 5 /nobreak > nul
 start http://localhost:8080/home
 
 exit
