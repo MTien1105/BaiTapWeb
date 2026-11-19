@@ -35,6 +35,8 @@ public class ForgotPasswordController extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
 
         String emailOrUsername = req.getParameter("emailOrUsername");
+        req.setAttribute("emailOrUsername", emailOrUsername != null ? emailOrUsername.trim() : "");
+
         if (emailOrUsername == null || emailOrUsername.trim().isEmpty()) {
             req.setAttribute("alert", "Vui lòng nhập tên tài khoản hoặc email!");
             req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
@@ -42,10 +44,21 @@ public class ForgotPasswordController extends HttpServlet {
         }
 
         String input = emailOrUsername.trim();
+
+        // Validate cơ bản nếu nhập email
+        if (input.contains("@")) {
+            String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+            if (!input.matches(emailRegex)) {
+                req.setAttribute("alert", "Địa chỉ email không đúng định dạng hợp lệ!");
+                req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
+                return;
+            }
+        }
+
         User user = input.contains("@") ? userService.findByEmail(input) : userService.get(input);
 
         if (user == null) {
-            req.setAttribute("alert", "Không tìm thấy tài khoản tương ứng với thông tin đã nhập!");
+            req.setAttribute("alert", "Không tìm thấy tài khoản nào khớp với thông tin đã nhập!");
             req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
             return;
         }

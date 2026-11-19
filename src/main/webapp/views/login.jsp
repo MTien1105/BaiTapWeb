@@ -30,8 +30,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="topbar.jsp" />
-
     <div class="login-container">
         <h2>Đăng Nhập Vào Hệ Thống</h2>
 
@@ -50,18 +48,20 @@
             <div class="alert-success">${message}</div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/login" method="post">
+        <form action="${pageContext.request.contextPath}/login" method="post" id="loginForm" novalidate>
             <c:if test="${not empty redirect}">
                 <input type="hidden" name="redirect" value="${redirect}">
             </c:if>
             <div class="form-group">
-                <label for="username">Tài khoản</label>
-                <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản" required autofocus>
+                <label for="username">Tài khoản <span style="color: red;">*</span></label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản (tối thiểu 3 ký tự)" value="${username}" required minlength="3" autofocus>
+                <div id="username-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <div class="form-group">
-                <label for="password">Mật khẩu</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                <label for="password">Mật khẩu <span style="color: red;">*</span></label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required minlength="6">
+                <div id="password-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <div class="form-check">
@@ -73,6 +73,47 @@
 
             <button type="submit" class="btn-primary">Đăng nhập</button>
         </form>
+
+        <script>
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                let valid = true;
+                const username = document.getElementById('username');
+                const password = document.getElementById('password');
+                const userErr = document.getElementById('username-error');
+                const passErr = document.getElementById('password-error');
+
+                userErr.style.display = 'none';
+                passErr.style.display = 'none';
+
+                if (!username.value.trim()) {
+                    userErr.textContent = 'Vui lòng nhập tên tài khoản!';
+                    userErr.style.display = 'block';
+                    username.focus();
+                    valid = false;
+                } else if (username.value.trim().length < 3) {
+                    userErr.textContent = 'Tên tài khoản phải có ít nhất 3 ký tự!';
+                    userErr.style.display = 'block';
+                    username.focus();
+                    valid = false;
+                }
+
+                if (!password.value) {
+                    passErr.textContent = 'Vui lòng nhập mật khẩu!';
+                    passErr.style.display = 'block';
+                    if (valid) password.focus();
+                    valid = false;
+                } else if (password.value.length < 6) {
+                    passErr.textContent = 'Mật khẩu phải có ít nhất 6 ký tự!';
+                    passErr.style.display = 'block';
+                    if (valid) password.focus();
+                    valid = false;
+                }
+
+                if (!valid) {
+                    e.preventDefault();
+                }
+            });
+        </script>
 
         <div class="footer-links">
             Nếu bạn chưa có tài khoản trên hệ thống, hãy <a href="${pageContext.request.contextPath}/register">Đăng ký</a>

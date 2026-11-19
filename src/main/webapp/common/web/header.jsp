@@ -60,7 +60,14 @@
                             <div class="dropdown">
                                 <button class="btn btn-secondary dropdown-toggle d-flex align-items-center gap-2 py-1 px-3 rounded-pill bg-dark border-secondary" type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center fw-bold" style="width: 28px; height: 28px; font-size: 13px;">
-                                        ${sessionScope.account.fullName.substring(0, 1).toUpperCase()}
+                                        <c:choose>
+                                            <c:when test="${not empty sessionScope.account.fullName}">
+                                                ${sessionScope.account.fullName.substring(0, 1).toUpperCase()}
+                                            </c:when>
+                                            <c:otherwise>
+                                                ${sessionScope.account.userName.substring(0, 1).toUpperCase()}
+                                            </c:otherwise>
+                                        </c:choose>
                                     </span>
                                     <span class="text-white fw-semibold small">${sessionScope.account.fullName}</span>
                                 </button>

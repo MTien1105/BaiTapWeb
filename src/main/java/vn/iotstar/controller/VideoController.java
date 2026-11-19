@@ -42,6 +42,7 @@ public class VideoController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html; charset=UTF-8");
         String uri = req.getRequestURI();
         HttpSession session = req.getSession(false);
         User loggedInUser = (session != null) ? (User) session.getAttribute("account") : null;
@@ -161,24 +162,119 @@ public class VideoController extends HttpServlet {
             String title = req.getParameter("title");
             String description = req.getParameter("description");
             String posterUrl = req.getParameter("posterUrl");
-            int views = 0;
-            try {
-                views = Integer.parseInt(req.getParameter("views"));
-            } catch (Exception ignored) {
+            String viewsParam = req.getParameter("views");
+            String activeParam = req.getParameter("active");
+            String userIdParam = req.getParameter("userId");
+
+            // Lưu dữ liệu để repopulate khi có lỗi validation
+            req.setAttribute("videoId", videoId != null ? videoId.trim() : "");
+            req.setAttribute("title", title != null ? title.trim() : "");
+            req.setAttribute("description", description != null ? description.trim() : "");
+            req.setAttribute("posterUrl", posterUrl != null ? posterUrl.trim() : "");
+            req.setAttribute("views", viewsParam != null ? viewsParam.trim() : "0");
+            req.setAttribute("active", activeParam != null ? activeParam.trim() : "1");
+            req.setAttribute("chosenUserId", userIdParam != null ? userIdParam.trim() : "");
+            req.setAttribute("isAdmin", isAdmin);
+
+            // 1. VALIDATION MÃ VIDEO (Video ID)
+            if (videoId == null || videoId.trim().isEmpty()) {
+                req.setAttribute("error", "Mã video (Video ID) không được để trống!");
+                if (isAdmin) req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                return;
             }
 
+            videoId = videoId.trim();
+            if (!videoId.matches("^[a-zA-Z0-9_-]{2,50}$")) {
+                req.setAttribute("error", "Mã video phải từ 2 đến 50 ký tự, chỉ gồm chữ cái, chữ số, gạch nối (-), gạch dưới (_), không chứa dấu tiếng Việt và khoảng trắng!");
+                if (isAdmin) req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                return;
+            }
+
+            // Kiểm tra trùng lặp khóa chính trong CSDL
+            if (videoService.findById(videoId) != null) {
+                req.setAttribute("error", "Mã video '" + videoId + "' đã tồn tại trong hệ thống! Vui lòng chọn mã khác.");
+                if (isAdmin) req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                return;
+            }
+
+            // 2. VALIDATION TIÊU ĐỀ (Title)
+            if (title == null || title.trim().isEmpty()) {
+                req.setAttribute("error", "Tiêu đề video không được để trống!");
+                if (isAdmin) req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                return;
+            }
+
+            title = title.trim();
+            if (title.length() < 3) {
+                req.setAttribute("error", "Tiêu đề video phải có tối thiểu 3 ký tự!");
+                if (isAdmin) req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                return;
+            }
+
+            if (title.length() > 500) {
+                req.setAttribute("error", "Tiêu đề video không được vượt quá 500 ký tự!");
+                if (isAdmin) req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                return;
+            }
+
+            // 3. VALIDATION LƯỢT XEM (Views)
+            int views = 0;
+            if (viewsParam != null && !viewsParam.trim().isEmpty()) {
+                try {
+                    views = Integer.parseInt(viewsParam.trim());
+                    if (views < 0) {
+                        req.setAttribute("error", "Số lượt xem (Views) phải là số nguyên không âm (>= 0)!");
+                        if (isAdmin) req.setAttribute("userList", userService.findAll());
+                        req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    req.setAttribute("error", "Số lượt xem (Views) không hợp lệ, phải là số nguyên!");
+                    if (isAdmin) req.setAttribute("userList", userService.findAll());
+                    req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                    return;
+                }
+            }
+
+            // 4. VALIDATION TRẠNG THÁI (Active)
             int active = 1;
+            if (activeParam != null && !activeParam.trim().isEmpty()) {
+                try {
+                    active = Integer.parseInt(activeParam.trim());
+                    if (active != 0 && active != 1) {
+                        active = 1;
+                    }
+                } catch (Exception ignored) {
+                    active = 1;
+                }
+            }
+
+            // 5. VALIDATION FILE UPLOAD (Định dạng ảnh)
             try {
-                active = Integer.parseInt(req.getParameter("active"));
+                Part part = req.getPart("posterFile");
+                if (part != null && part.getSize() > 0) {
+                    String submittedFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString().toLowerCase();
+                    if (!submittedFileName.matches(".*\\.(jpg|jpeg|png|gif|webp)$")) {
+                        req.setAttribute("error", "File ảnh tải lên không đúng định dạng! Chỉ chấp nhận: .jpg, .jpeg, .png, .gif, .webp.");
+                        if (isAdmin) req.setAttribute("userList", userService.findAll());
+                        req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                        return;
+                    }
+                }
             } catch (Exception ignored) {
             }
 
             // Xác định User sở hữu video:
-            // Admin có thể chọn user khác; User thường luôn gán cho chính mình!
             User owner = loggedInUser;
-            if (isAdmin) {
+            if (isAdmin && userIdParam != null && !userIdParam.trim().isEmpty()) {
                 try {
-                    int chosenUserId = Integer.parseInt(req.getParameter("userId"));
+                    int chosenUserId = Integer.parseInt(userIdParam.trim());
                     if (chosenUserId > 0) {
                         User chosenUser = userService.findById(chosenUserId);
                         if (chosenUser != null) {
@@ -194,7 +290,7 @@ public class VideoController extends HttpServlet {
             Video video = new Video(videoId, title, description, poster, views, active, owner);
             videoService.insert(video);
 
-            session.setAttribute("flashMessage", "Đã thêm video mới thành công!");
+            session.setAttribute("flashMessage", "Đã thêm video mới '" + title + "' thành công!");
             resp.sendRedirect(req.getContextPath() + "/admin/videos");
 
         } else if (uri.contains("/admin/video/update")) {
@@ -202,17 +298,9 @@ public class VideoController extends HttpServlet {
             String title = req.getParameter("title");
             String description = req.getParameter("description");
             String posterUrl = req.getParameter("posterUrl");
-            int views = 0;
-            try {
-                views = Integer.parseInt(req.getParameter("views"));
-            } catch (Exception ignored) {
-            }
-
-            int active = 1;
-            try {
-                active = Integer.parseInt(req.getParameter("active"));
-            } catch (Exception ignored) {
-            }
+            String viewsParam = req.getParameter("views");
+            String activeParam = req.getParameter("active");
+            String userIdParam = req.getParameter("userId");
 
             Video existing = videoService.findById(videoId);
             if (existing == null) {
@@ -228,6 +316,88 @@ public class VideoController extends HttpServlet {
                 return;
             }
 
+            // 1. VALIDATION TIÊU ĐỀ
+            if (title == null || title.trim().isEmpty()) {
+                req.setAttribute("error", "Tiêu đề video không được để trống!");
+                req.setAttribute("video", existing);
+                req.setAttribute("isAdmin", isAdmin);
+                if (isAdmin) req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                return;
+            }
+
+            title = title.trim();
+            if (title.length() < 3) {
+                req.setAttribute("error", "Tiêu đề video phải có tối thiểu 3 ký tự!");
+                req.setAttribute("video", existing);
+                req.setAttribute("isAdmin", isAdmin);
+                if (isAdmin) req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                return;
+            }
+
+            if (title.length() > 500) {
+                req.setAttribute("error", "Tiêu đề video không được vượt quá 500 ký tự!");
+                req.setAttribute("video", existing);
+                req.setAttribute("isAdmin", isAdmin);
+                if (isAdmin) req.setAttribute("userList", userService.findAll());
+                req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                return;
+            }
+
+            // 2. VALIDATION LƯỢT XEM
+            int views = existing.getViews();
+            if (viewsParam != null && !viewsParam.trim().isEmpty()) {
+                try {
+                    views = Integer.parseInt(viewsParam.trim());
+                    if (views < 0) {
+                        req.setAttribute("error", "Số lượt xem (Views) phải là số nguyên không âm (>= 0)!");
+                        req.setAttribute("video", existing);
+                        req.setAttribute("isAdmin", isAdmin);
+                        if (isAdmin) req.setAttribute("userList", userService.findAll());
+                        req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    req.setAttribute("error", "Số lượt xem (Views) không hợp lệ, phải là số nguyên!");
+                    req.setAttribute("video", existing);
+                    req.setAttribute("isAdmin", isAdmin);
+                    if (isAdmin) req.setAttribute("userList", userService.findAll());
+                    req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                    return;
+                }
+            }
+
+            // 3. VALIDATION TRẠNG THÁI
+            int active = 1;
+            if (activeParam != null && !activeParam.trim().isEmpty()) {
+                try {
+                    active = Integer.parseInt(activeParam.trim());
+                    if (active != 0 && active != 1) {
+                        active = 1;
+                    }
+                } catch (Exception ignored) {
+                    active = 1;
+                }
+            }
+
+            // 4. VALIDATION FILE UPLOAD (Định dạng ảnh)
+            try {
+                Part part = req.getPart("posterFile");
+                if (part != null && part.getSize() > 0) {
+                    String submittedFileName = Paths.get(part.getSubmittedFileName()).getFileName().toString().toLowerCase();
+                    if (!submittedFileName.matches(".*\\.(jpg|jpeg|png|gif|webp)$")) {
+                        req.setAttribute("error", "File ảnh tải lên không đúng định dạng! Chỉ chấp nhận: .jpg, .jpeg, .png, .gif, .webp.");
+                        req.setAttribute("video", existing);
+                        req.setAttribute("isAdmin", isAdmin);
+                        if (isAdmin) req.setAttribute("userList", userService.findAll());
+                        req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                        return;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+
             String poster = handlePosterUpload(req, posterUrl);
             if ((poster == null || poster.trim().isEmpty()) && existing != null) {
                 poster = existing.getPoster();
@@ -235,9 +405,9 @@ public class VideoController extends HttpServlet {
 
             // Quyền sở hữu:
             User owner = existing.getUser();
-            if (isAdmin) {
+            if (isAdmin && userIdParam != null && !userIdParam.trim().isEmpty()) {
                 try {
-                    int chosenUserId = Integer.parseInt(req.getParameter("userId"));
+                    int chosenUserId = Integer.parseInt(userIdParam.trim());
                     if (chosenUserId > 0) {
                         User chosenUser = userService.findById(chosenUserId);
                         if (chosenUser != null) {
@@ -251,7 +421,7 @@ public class VideoController extends HttpServlet {
             Video video = new Video(videoId, title, description, poster, views, active, owner);
             videoService.update(video);
 
-            session.setAttribute("flashMessage", "Đã cập nhật video " + videoId + " thành công!");
+            session.setAttribute("flashMessage", "Đã cập nhật video '" + videoId + "' thành công!");
             resp.sendRedirect(req.getContextPath() + "/admin/videos");
         }
     }

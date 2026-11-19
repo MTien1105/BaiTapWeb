@@ -44,26 +44,71 @@
             </div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/reset-password" method="post">
+        <form action="${pageContext.request.contextPath}/reset-password" method="post" id="resetForm" novalidate>
             <input type="hidden" name="email" value="${email}">
 
             <div class="form-group">
-                <label for="otp">Mã Xác Nhận OTP (6 chữ số)</label>
+                <label for="otp">Mã Xác Nhận OTP (6 chữ số) <span style="color: red;">*</span></label>
                 <input type="text" id="otp" name="otp" class="form-control otp-input" maxlength="6" pattern="[0-9]{6}" placeholder="------" required autofocus autocomplete="one-time-code">
+                <div id="otp-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; text-align: center; display: none;"></div>
             </div>
 
             <div class="form-group">
-                <label for="newPassword">Mật khẩu mới</label>
+                <label for="newPassword">Mật khẩu mới <span style="color: red;">*</span></label>
                 <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" required minlength="6">
+                <div id="newPassword-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <div class="form-group">
-                <label for="confirmPassword">Xác nhận mật khẩu mới</label>
+                <label for="confirmPassword">Xác nhận mật khẩu mới <span style="color: red;">*</span></label>
                 <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu mới" required minlength="6">
+                <div id="confirmPassword-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <button type="submit" class="btn-warning">Cập Nhật Mật Khẩu Mới</button>
         </form>
+
+        <script>
+            document.getElementById('resetForm').addEventListener('submit', function(e) {
+                let valid = true;
+
+                function showError(id, errId, msg) {
+                    const el = document.getElementById(errId);
+                    el.textContent = msg;
+                    el.style.display = 'block';
+                    if (valid) document.getElementById(id).focus();
+                    valid = false;
+                }
+
+                document.querySelectorAll('[id$="-error"]').forEach(el => el.style.display = 'none');
+
+                const otp = document.getElementById('otp').value.trim();
+                const newPass = document.getElementById('newPassword').value;
+                const confirmPass = document.getElementById('confirmPassword').value;
+
+                if (!otp) {
+                    showError('otp', 'otp-error', 'Vui lòng nhập mã OTP!');
+                } else if (!/^[0-9]{6}$/.test(otp)) {
+                    showError('otp', 'otp-error', 'Mã OTP phải gồm đúng 6 chữ số!');
+                }
+
+                if (!newPass) {
+                    showError('newPassword', 'newPassword-error', 'Vui lòng nhập mật khẩu mới!');
+                } else if (newPass.length < 6) {
+                    showError('newPassword', 'newPassword-error', 'Mật khẩu mới phải có tối thiểu 6 ký tự!');
+                }
+
+                if (!confirmPass) {
+                    showError('confirmPassword', 'confirmPassword-error', 'Vui lòng nhập xác nhận mật khẩu!');
+                } else if (newPass !== confirmPass) {
+                    showError('confirmPassword', 'confirmPassword-error', 'Mật khẩu xác nhận không khớp với mật khẩu mới!');
+                }
+
+                if (!valid) {
+                    e.preventDefault();
+                }
+            });
+        </script>
 
         <div class="footer-links">
             Quay lại trang <a href="${pageContext.request.contextPath}/login">Đăng nhập</a>

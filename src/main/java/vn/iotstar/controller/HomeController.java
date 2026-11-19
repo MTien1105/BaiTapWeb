@@ -21,6 +21,8 @@ public class HomeController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html; charset=UTF-8");
+
         // Lấy 10 video mới nhất đang ở trạng thái hoạt động (Active = 1)
         List<Video> top10Videos = videoService.findTop10Latest();
         req.setAttribute("top10Videos", top10Videos);

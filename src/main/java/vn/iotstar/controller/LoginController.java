@@ -83,8 +83,30 @@ public class LoginController extends HttpServlet {
             req.setAttribute("redirect", redirect.trim());
         }
 
-        if (username == null || password == null || username.trim().isEmpty() || password.trim().isEmpty()) {
-            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không được để trống!");
+        // Giữ lại username đã nhập để người dùng không phải gõ lại
+        req.setAttribute("username", username != null ? username.trim() : "");
+
+        // SERVER-SIDE VALIDATION
+        if (username == null || username.trim().isEmpty()) {
+            req.setAttribute("alert", "Vui lòng nhập tên tài khoản!");
+            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            return;
+        }
+
+        if (password == null || password.trim().isEmpty()) {
+            req.setAttribute("alert", "Vui lòng nhập mật khẩu!");
+            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            return;
+        }
+
+        if (username.trim().length() < 3) {
+            req.setAttribute("alert", "Tên tài khoản phải có ít nhất 3 ký tự!");
+            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            return;
+        }
+
+        if (password.length() < 6) {
+            req.setAttribute("alert", "Mật khẩu phải có ít nhất 6 ký tự!");
             req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
             return;
         }

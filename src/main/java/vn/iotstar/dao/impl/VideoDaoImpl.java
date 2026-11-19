@@ -111,7 +111,7 @@ public class VideoDaoImpl implements IVideoDao {
     public List<Video> findTop10Latest() {
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            String jpql = "SELECT v FROM Video v WHERE v.active = 1 ORDER BY v.videoId DESC";
+            String jpql = "SELECT v FROM Video v LEFT JOIN FETCH v.user WHERE v.active = 1 ORDER BY v.videoId DESC";
             TypedQuery<Video> query = em.createQuery(jpql, Video.class);
             query.setMaxResults(10);
             return query.getResultList();
@@ -124,7 +124,7 @@ public class VideoDaoImpl implements IVideoDao {
     public List<Video> findByUserId(int userId) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            String jpql = "SELECT v FROM Video v WHERE v.user.id = :userId ORDER BY v.videoId DESC";
+            String jpql = "SELECT v FROM Video v LEFT JOIN FETCH v.user WHERE v.user.id = :userId ORDER BY v.videoId DESC";
             TypedQuery<Video> query = em.createQuery(jpql, Video.class);
             query.setParameter("userId", userId);
             return query.getResultList();
@@ -137,7 +137,7 @@ public class VideoDaoImpl implements IVideoDao {
     public List<Video> searchByTitleAndUserId(String keyword, int userId) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            String jpql = "SELECT v FROM Video v WHERE v.user.id = :userId AND LOWER(v.title) LIKE LOWER(:keyword) ORDER BY v.videoId DESC";
+            String jpql = "SELECT v FROM Video v LEFT JOIN FETCH v.user WHERE v.user.id = :userId AND LOWER(v.title) LIKE LOWER(:keyword) ORDER BY v.videoId DESC";
             TypedQuery<Video> query = em.createQuery(jpql, Video.class);
             query.setParameter("userId", userId);
             query.setParameter("keyword", "%" + keyword + "%");
@@ -151,7 +151,7 @@ public class VideoDaoImpl implements IVideoDao {
     public List<Video> findByUserId(int userId, int page, int pageSize) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            String jpql = "SELECT v FROM Video v WHERE v.user.id = :userId AND v.active = 1 ORDER BY v.videoId DESC";
+            String jpql = "SELECT v FROM Video v LEFT JOIN FETCH v.user WHERE v.user.id = :userId AND v.active = 1 ORDER BY v.videoId DESC";
             TypedQuery<Video> query = em.createQuery(jpql, Video.class);
             query.setParameter("userId", userId);
             query.setFirstResult((page - 1) * pageSize);
@@ -179,7 +179,7 @@ public class VideoDaoImpl implements IVideoDao {
     public List<Video> findAllActivePaginated(int page, int pageSize) {
         EntityManager em = JPAConfig.getEntityManager();
         try {
-            String jpql = "SELECT v FROM Video v WHERE v.active = 1 ORDER BY v.videoId DESC";
+            String jpql = "SELECT v FROM Video v LEFT JOIN FETCH v.user WHERE v.active = 1 ORDER BY v.videoId DESC";
             TypedQuery<Video> query = em.createQuery(jpql, Video.class);
             query.setFirstResult((page - 1) * pageSize);
             query.setMaxResults(pageSize);

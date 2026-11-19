@@ -131,8 +131,8 @@
                                 </a>
                                 <div class="video-desc" title="${v.description}">${v.description != null ? v.description : 'Không có mô tả nội dung.'}</div>
                                 <div class="video-footer">
-                                    <span class="uploader-tag" title="Mối quan hệ 1-N: Video thuộc về User ID ${v.user != null ? v.user.id : ''}">
-                                        👤 ${v.user != null ? v.user.fullName : 'Hệ thống'}
+                                    <span class="uploader-tag">
+                                        👤 <c:out value="${v.user.fullName}" default="Hệ thống" />
                                     </span>
                                     <span style="color: #888; font-size: 11px;">Mã: ${v.videoId}</span>
                                 </div>

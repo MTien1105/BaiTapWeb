@@ -35,7 +35,13 @@
         <h2>✏️ CẬP NHẬT THÔNG TIN VIDEO</h2>
         <p class="subtitle">Chỉnh sửa thông tin video và cập nhật liên kết sở hữu với tài khoản Users</p>
 
-        <form action="${pageContext.request.contextPath}/admin/video/update" method="post" enctype="multipart/form-data">
+        <c:if test="${not empty error}">
+            <div style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
+                ⚠️ <strong>Lỗi:</strong> ${error}
+            </div>
+        </c:if>
+
+        <form action="${pageContext.request.contextPath}/admin/video/update" method="post" enctype="multipart/form-data" id="editVideoForm" novalidate>
             <div class="form-group">
                 <label for="videoId">Mã Video (Khóa chính - Không đổi):</label>
                 <input type="text" id="videoId" name="videoId" value="${video.videoId}" readonly style="background-color: #e9ecef; cursor: not-allowed;">
@@ -43,7 +49,8 @@
 
             <div class="form-group">
                 <label for="title">Tiêu Đề Video <span style="color: red;">*</span>:</label>
-                <input type="text" id="title" name="title" value="${video.title}" required placeholder="Nhập tên / tiêu đề video...">
+                <input type="text" id="title" name="title" value="${video.title}" required placeholder="Nhập tên / tiêu đề video (tối thiểu 3 ký tự)...">
+                <div id="title-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <div class="form-group">
@@ -95,6 +102,7 @@
             <div class="form-group">
                 <label for="posterFile">Hoặc Tải Lên Ảnh Poster Mới:</label>
                 <input type="file" id="posterFile" name="posterFile" accept="image/*">
+                <div id="posterFile-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
                 <div class="hint">Bỏ trống nếu muốn giữ nguyên ảnh hiện tại.</div>
             </div>
 
@@ -102,6 +110,7 @@
                 <div class="form-group" style="flex: 1;">
                     <label for="views">Lượt Xem (Views):</label>
                     <input type="number" id="views" name="views" value="${video.views}" min="0">
+                    <div id="views-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
                 </div>
 
                 <div class="form-group" style="flex: 1;">
@@ -118,6 +127,59 @@
                 <a href="${pageContext.request.contextPath}/admin/videos" class="btn btn-cancel">Hủy Bỏ</a>
             </div>
         </form>
+
+        <script>
+            document.getElementById('editVideoForm').addEventListener('submit', function(e) {
+                let valid = true;
+
+                function showError(inputId, errorId, msg) {
+                    const err = document.getElementById(errorId);
+                    err.textContent = msg;
+                    err.style.display = 'block';
+                    if (valid) {
+                        document.getElementById(inputId).focus();
+                    }
+                    valid = false;
+                }
+
+                document.querySelectorAll('[id$="-error"]').forEach(el => el.style.display = 'none');
+
+                const title = document.getElementById('title').value.trim();
+                const views = document.getElementById('views').value;
+                const posterFile = document.getElementById('posterFile');
+
+                // Validate title
+                if (!title) {
+                    showError('title', 'title-error', 'Vui lòng nhập Tiêu đề Video!');
+                } else if (title.length < 3) {
+                    showError('title', 'title-error', 'Tiêu đề video phải có ít nhất 3 ký tự!');
+                } else if (title.length > 500) {
+                    showError('title', 'title-error', 'Tiêu đề video không được vượt quá 500 ký tự!');
+                }
+
+                // Validate views
+                if (views !== '' && (isNaN(views) || parseInt(views) < 0)) {
+                    showError('views', 'views-error', 'Lượt xem phải là số nguyên không âm (>= 0)!');
+                }
+
+                // Validate file ảnh nếu có chọn
+                if (posterFile.files && posterFile.files.length > 0) {
+                    const file = posterFile.files[0];
+                    const validExts = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+                    const fileName = file.name.toLowerCase();
+                    const isValidExt = validExts.some(ext => fileName.endsWith(ext));
+                    if (!isValidExt) {
+                        showError('posterFile', 'posterFile-error', 'File không đúng định dạng ảnh (.jpg, .jpeg, .png, .gif, .webp)!');
+                    } else if (file.size > 10 * 1024 * 1024) {
+                        showError('posterFile', 'posterFile-error', 'Kích thước file ảnh không được vượt quá 10MB!');
+                    }
+                }
+
+                if (!valid) {
+                    e.preventDefault();
+                }
+            });
+        </script>
     </div>
 </body>
 </html>

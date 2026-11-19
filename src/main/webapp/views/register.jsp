@@ -32,34 +32,123 @@
             <div class="alert-danger">${alert}</div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/register" method="post">
+        <form action="${pageContext.request.contextPath}/register" method="post" id="registerForm" novalidate>
             <div class="form-group">
-                <label for="username">Tài khoản</label>
-                <input type="text" id="username" name="username" class="form-control" placeholder="Nhập tài khoản (username)" required autofocus>
+                <label for="username">Tài khoản <span style="color: red;">*</span></label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Tên tài khoản (3-30 ký tự, không dấu)" value="${username}" required autofocus>
+                <div id="username-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <div class="form-group">
-                <label for="fullname">Họ tên</label>
-                <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Nhập họ và tên" required>
+                <label for="fullname">Họ tên <span style="color: red;">*</span></label>
+                <input type="text" id="fullname" name="fullname" class="form-control" placeholder="Nhập họ và tên đầy đủ" value="${fullname}" required>
+                <div id="fullname-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="Nhập địa chỉ email" required>
+                <label for="email">Email <span style="color: red;">*</span></label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Nhập địa chỉ email hợp lệ" value="${email}" required>
+                <div id="email-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <div class="form-group">
                 <label for="phone">Số điện thoại</label>
-                <input type="tel" id="phone" name="phone" class="form-control" placeholder="Nhập số điện thoại">
+                <input type="tel" id="phone" name="phone" class="form-control" placeholder="Nhập số điện thoại (10 chữ số)" value="${phone}">
+                <div id="phone-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <div class="form-group">
-                <label for="password">Mật khẩu</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu" required>
+                <label for="password">Mật khẩu <span style="color: red;">*</span></label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)" required minlength="6">
+                <div id="password-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Xác nhận mật khẩu <span style="color: red;">*</span></label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" required minlength="6">
+                <div id="confirmPassword-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <button type="submit" class="btn-success">Tạo tài khoản</button>
         </form>
+
+        <script>
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                let valid = true;
+
+                function showError(inputId, errorId, msg) {
+                    const err = document.getElementById(errorId);
+                    err.textContent = msg;
+                    err.style.display = 'block';
+                    if (valid) {
+                        document.getElementById(inputId).focus();
+                    }
+                    valid = false;
+                }
+
+                function hideErrors() {
+                    const errors = document.querySelectorAll('[id$="-error"]');
+                    errors.forEach(el => el.style.display = 'none');
+                }
+
+                hideErrors();
+
+                const username = document.getElementById('username').value.trim();
+                const fullname = document.getElementById('fullname').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                // Validate Username
+                if (!username) {
+                    showError('username', 'username-error', 'Vui lòng nhập tên tài khoản!');
+                } else if (!/^[a-zA-Z0-9_]{3,30}$/.test(username)) {
+                    showError('username', 'username-error', 'Tên tài khoản chỉ gồm chữ cái, số, gạch dưới (3-30 ký tự, không dấu, không khoảng trắng)!');
+                }
+
+                // Validate Fullname
+                if (!fullname) {
+                    showError('fullname', 'fullname-error', 'Vui lòng nhập họ và tên!');
+                } else if (fullname.length < 2) {
+                    showError('fullname', 'fullname-error', 'Họ tên phải có ít nhất 2 ký tự!');
+                }
+
+                // Validate Email
+                const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+                if (!email) {
+                    showError('email', 'email-error', 'Vui lòng nhập địa chỉ email!');
+                } else if (!emailRegex.test(email)) {
+                    showError('email', 'email-error', 'Địa chỉ email không đúng định dạng!');
+                }
+
+                // Validate Phone nếu có nhập
+                if (phone) {
+                    const phoneRegex = /^(0|\+84)[3|5|7|8|9][0-9]{8}$/;
+                    if (!phoneRegex.test(phone)) {
+                        showError('phone', 'phone-error', 'Số điện thoại không hợp lệ (cần 10 chữ số, đầu số 03, 05, 07, 08, 09)!');
+                    }
+                }
+
+                // Validate Password
+                if (!password) {
+                    showError('password', 'password-error', 'Vui lòng nhập mật khẩu!');
+                } else if (password.length < 6) {
+                    showError('password', 'password-error', 'Mật khẩu phải có tối thiểu 6 ký tự!');
+                }
+
+                // Validate Confirm Password
+                if (!confirmPassword) {
+                    showError('confirmPassword', 'confirmPassword-error', 'Vui lòng xác nhận mật khẩu!');
+                } else if (password !== confirmPassword) {
+                    showError('confirmPassword', 'confirmPassword-error', 'Mật khẩu xác nhận không khớp!');
+                }
+
+                if (!valid) {
+                    e.preventDefault();
+                }
+            });
+        </script>
 
         <div class="footer-links">
             Nếu bạn đã có tài khoản? <a href="${pageContext.request.contextPath}/login">Đăng nhập</a>

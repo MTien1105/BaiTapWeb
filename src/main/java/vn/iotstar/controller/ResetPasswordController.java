@@ -67,14 +67,21 @@ public class ResetPasswordController extends HttpServlet {
             return;
         }
 
-        if (!newPassword.equals(confirmPassword)) {
-            req.setAttribute("alert", "Mật khẩu mới và mật khẩu xác nhận không khớp nhau!");
+        // Validate OTP định dạng 6 chữ số
+        if (!otp.trim().matches("^[0-9]{6}$")) {
+            req.setAttribute("alert", "Mã OTP xác thực phải gồm đúng 6 chữ số!");
             req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
             return;
         }
 
         if (newPassword.length() < 6) {
             req.setAttribute("alert", "Mật khẩu mới phải có tối thiểu 6 ký tự!");
+            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
+            return;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            req.setAttribute("alert", "Mật khẩu mới và mật khẩu xác nhận không khớp nhau!");
             req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
             return;
         }

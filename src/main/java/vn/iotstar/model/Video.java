@@ -3,6 +3,7 @@ package vn.iotstar.model;
 import java.io.Serializable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -35,7 +36,7 @@ public class Video implements Serializable {
     private int views = 0;
 
     // Mối quan hệ N-1: Nhiều Video thuộc về 1 User
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "UserId", nullable = false)
     private User user;
 

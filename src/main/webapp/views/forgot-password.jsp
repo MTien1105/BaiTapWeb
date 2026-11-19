@@ -34,14 +34,35 @@
             <div class="alert-danger">${alert}</div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/forgot-password" method="post">
+        <form action="${pageContext.request.contextPath}/forgot-password" method="post" id="forgotForm" novalidate>
             <div class="form-group">
-                <label for="emailOrUsername">Tài khoản hoặc Địa chỉ Email</label>
-                <input type="text" id="emailOrUsername" name="emailOrUsername" class="form-control" placeholder="Ví dụ: admin hoặc user@example.com" required autofocus>
+                <label for="emailOrUsername">Tài khoản hoặc Địa chỉ Email <span style="color: red;">*</span></label>
+                <input type="text" id="emailOrUsername" name="emailOrUsername" class="form-control" placeholder="Ví dụ: admin hoặc user@example.com" value="${emailOrUsername}" required autofocus>
+                <div id="input-error" style="color: #dc3545; font-size: 12.5px; margin-top: 4px; display: none;"></div>
             </div>
 
             <button type="submit" class="btn-primary">Gửi Mã Xác Nhận OTP</button>
         </form>
+
+        <script>
+            document.getElementById('forgotForm').addEventListener('submit', function(e) {
+                const input = document.getElementById('emailOrUsername').value.trim();
+                const err = document.getElementById('input-error');
+                err.style.display = 'none';
+
+                if (!input) {
+                    err.textContent = 'Vui lòng nhập tên tài khoản hoặc địa chỉ email!';
+                    err.style.display = 'block';
+                    document.getElementById('emailOrUsername').focus();
+                    e.preventDefault();
+                } else if (input.includes('@') && !/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(input)) {
+                    err.textContent = 'Địa chỉ email không đúng định dạng!';
+                    err.style.display = 'block';
+                    document.getElementById('emailOrUsername').focus();
+                    e.preventDefault();
+                }
+            });
+        </script>
 
         <div class="footer-links">
             Nhớ lại mật khẩu rồi? <a href="${pageContext.request.contextPath}/login">Đăng nhập ngay</a>

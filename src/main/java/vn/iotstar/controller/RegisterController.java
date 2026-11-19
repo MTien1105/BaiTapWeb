@@ -50,38 +50,98 @@ public class RegisterController extends HttpServlet {
 
         String username = req.getParameter("username");
         String password = req.getParameter("password");
+        String confirmPassword = req.getParameter("confirmPassword");
         String email = req.getParameter("email");
         String fullname = req.getParameter("fullname");
         String phone = req.getParameter("phone");
 
+        // Giữ lại dữ liệu đã nhập để trả về form nếu có lỗi
+        req.setAttribute("username", username != null ? username.trim() : "");
+        req.setAttribute("fullname", fullname != null ? fullname.trim() : "");
+        req.setAttribute("email", email != null ? email.trim() : "");
+        req.setAttribute("phone", phone != null ? phone.trim() : "");
+
         UserService service = new UserServiceImpl();
         String alertMsg = "";
 
-        if (username == null || password == null || email == null ||
-                username.trim().isEmpty() || password.trim().isEmpty() || email.trim().isEmpty()) {
-            alertMsg = "Vui lòng nhập đầy đủ các thông tin bắt buộc!";
-            req.setAttribute("alert", alertMsg);
+        // 1. Kiểm tra rỗng các trường bắt buộc
+        if (username == null || username.trim().isEmpty()) {
+            req.setAttribute("alert", "Vui lòng nhập tên tài khoản!");
+            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+            return;
+        }
+
+        if (fullname == null || fullname.trim().isEmpty()) {
+            req.setAttribute("alert", "Vui lòng nhập họ và tên!");
+            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+            return;
+        }
+
+        if (email == null || email.trim().isEmpty()) {
+            req.setAttribute("alert", "Vui lòng nhập địa chỉ email!");
+            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+            return;
+        }
+
+        if (password == null || password.trim().isEmpty()) {
+            req.setAttribute("alert", "Vui lòng nhập mật khẩu!");
+            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+            return;
+        }
+
+        // 2. Validate định dạng tên tài khoản (3-30 ký tự, chữ cái, số hoặc gạch dưới)
+        if (!username.trim().matches("^[a-zA-Z0-9_]{3,30}$")) {
+            req.setAttribute("alert", "Tên tài khoản chỉ được chứa chữ cái, số và dấu gạch dưới (độ dài 3-30 ký tự, không dấu, không khoảng trắng)!");
+            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+            return;
+        }
+
+        // 3. Validate định dạng Email
+        String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+        if (!email.trim().matches(emailRegex)) {
+            req.setAttribute("alert", "Địa chỉ email không đúng định dạng hợp lệ (Ví dụ: user@example.com)!");
+            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+            return;
+        }
+
+        // 4. Validate định dạng số điện thoại nếu người dùng có nhập
+        if (phone != null && !phone.trim().isEmpty()) {
+            String phoneRegex = "^(0|\\+84)[3|5|7|8|9][0-9]{8}$";
+            if (!phone.trim().matches(phoneRegex)) {
+                req.setAttribute("alert", "Số điện thoại không hợp lệ (Phải là số điện thoại Việt Nam gồm 10 chữ số, bắt đầu bằng 03, 05, 07, 08, 09)!");
+                req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+                return;
+            }
+        }
+
+        // 5. Validate độ dài mật khẩu và xác nhận mật khẩu
+        if (password.length() < 6) {
+            req.setAttribute("alert", "Mật khẩu phải có tối thiểu 6 ký tự!");
+            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+            return;
+        }
+
+        if (confirmPassword != null && !password.equals(confirmPassword)) {
+            req.setAttribute("alert", "Mật khẩu xác nhận không khớp với mật khẩu đã nhập!");
+            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+            return;
+        }
+
+        // 6. Kiểm tra trùng lặp trong cơ sở dữ liệu
+        if (service.checkExistUsername(username.trim())) {
+            req.setAttribute("alert", "Tên tài khoản này đã được sử dụng bởi người khác!");
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
             return;
         }
 
         if (service.checkExistEmail(email.trim())) {
-            alertMsg = "Email này đã được sử dụng!";
-            req.setAttribute("alert", alertMsg);
-            req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
-            return;
-        }
-
-        if (service.checkExistUsername(username.trim())) {
-            alertMsg = "Tên tài khoản này đã tồn tại!";
-            req.setAttribute("alert", alertMsg);
+            req.setAttribute("alert", "Địa chỉ email này đã được đăng ký trong hệ thống!");
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
             return;
         }
 
         if (phone != null && !phone.trim().isEmpty() && service.checkExistPhone(phone.trim())) {
-            alertMsg = "Số điện thoại này đã được sử dụng!";
-            req.setAttribute("alert", alertMsg);
+            req.setAttribute("alert", "Số điện thoại này đã được sử dụng bởi tài khoản khác!");
             req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
             return;
         }
