@@ -29,8 +29,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/views/topbar.jsp" />
-
     <div class="container">
         <h2>➕ THÊM VIDEO MỚI</h2>
         <p class="subtitle">Thêm mới video vào hệ thống với mối quan hệ 1-N liên kết tới tài khoản Users</p>

@@ -57,8 +57,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="topbar.jsp" />
-
     <div class="main-container">
         <!-- Khu vực thông tin người dùng nếu đã đăng nhập -->
         <c:if test="${sessionScope.account != null}">

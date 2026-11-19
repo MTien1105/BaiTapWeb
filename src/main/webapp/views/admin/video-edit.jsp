@@ -31,8 +31,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/views/topbar.jsp" />
-
     <div class="container">
         <h2>✏️ CẬP NHẬT THÔNG TIN VIDEO</h2>
         <p class="subtitle">Chỉnh sửa thông tin video và cập nhật liên kết sở hữu với tài khoản Users</p>

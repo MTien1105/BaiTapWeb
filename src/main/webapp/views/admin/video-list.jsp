@@ -42,8 +42,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/views/topbar.jsp" />
-
     <div class="container">
         <!-- Thông báo lỗi hoặc thành công nếu có -->
         <c:if test="${not empty flashError}">

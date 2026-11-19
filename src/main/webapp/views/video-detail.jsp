@@ -60,8 +60,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/views/topbar.jsp" />
-
     <div class="detail-container">
         <!-- Khu vực phát video chính (Player + Thông tin chi tiết) -->
         <div class="video-main">

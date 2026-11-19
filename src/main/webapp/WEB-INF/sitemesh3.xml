@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+    <!-- Khai báo Decorator cho phần Quản trị (/admin/*) -->
+    <mapping path="/admin/*" decorator="/decorators/admin.jsp" />
+
+    <!-- Khai báo Decorator mặc định dùng Template Bootstrap cho toàn bộ trang web (/*) -->
+    <mapping path="/*" decorator="/decorators/web.jsp" />
+
+    <!-- Các đường dẫn loại trừ, không áp dụng Decorator -->
+    <mapping path="/login*" exclude="true" />
+    <mapping path="/register*" exclude="true" />
+    <mapping path="/verify-code*" exclude="true" />
+    <mapping path="/forgot-password*" exclude="true" />
+    <mapping path="/reset-password*" exclude="true" />
+    <mapping path="/uploads/*" exclude="true" />
+    <mapping path="/static/*" exclude="true" />
+    <mapping path="/assets/*" exclude="true" />
+</sitemesh>

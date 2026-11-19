@@ -60,8 +60,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="/views/topbar.jsp" />
-
     <div class="main-container">
         <!-- Khung tiêu đề và Bộ lọc theo User -->
         <div class="page-header">

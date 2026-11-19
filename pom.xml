@@ -95,6 +95,13 @@
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
+
+        <!-- SiteMesh 3 (Hỗ trợ Jakarta EE 10 / Tomcat 11) -->
+        <dependency>
+            <groupId>org.sitemesh</groupId>
+            <artifactId>sitemesh</artifactId>
+            <version>3.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
