@@ -24,8 +24,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="topbar.jsp" />
-
     <div class="forgot-container">
         <h2>🔑 Quên Mật Khẩu</h2>
         <p class="desc">Nhập tên tài khoản hoặc email của bạn. Hệ thống sẽ gửi một mã xác nhận OTP về hòm thư để bạn thiết lập lại mật khẩu mới.</p>

@@ -23,8 +23,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="topbar.jsp" />
-
     <div class="register-container">
         <h2>Tạo Tài Khoản Mới</h2>
 

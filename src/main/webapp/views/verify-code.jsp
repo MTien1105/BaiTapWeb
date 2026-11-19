@@ -31,8 +31,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="topbar.jsp" />
-
     <div class="verify-container">
         <h2>📧 Kích Hoạt Tài Khoản</h2>
         <p class="desc">Mã xác thực OTP gồm 6 chữ số đã được gửi tới hòm thư:<br><strong>${email}</strong></p>
@@ -51,16 +49,37 @@
             </div>
         </c:if>
 
-        <form action="${pageContext.request.contextPath}/verify-code" method="post">
+        <form action="${pageContext.request.contextPath}/verify-code" method="post" id="verifyForm" novalidate>
             <input type="hidden" name="email" value="${email}">
 
             <div class="form-group">
-                <label for="otp">Nhập Mã OTP (6 chữ số)</label>
+                <label for="otp">Nhập Mã OTP (6 chữ số) <span style="color: red;">*</span></label>
                 <input type="text" id="otp" name="otp" class="otp-input" maxlength="6" pattern="[0-9]{6}" placeholder="------" required autofocus autocomplete="one-time-code">
+                <div id="otp-error" style="color: #dc3545; font-size: 13px; margin-top: 6px; text-align: center; display: none;"></div>
             </div>
 
             <button type="submit" class="btn-success">Xác Nhận Kích Hoạt</button>
         </form>
+
+        <script>
+            document.getElementById('verifyForm').addEventListener('submit', function(e) {
+                const otp = document.getElementById('otp').value.trim();
+                const err = document.getElementById('otp-error');
+                err.style.display = 'none';
+
+                if (!otp) {
+                    err.textContent = 'Vui lòng nhập mã OTP!';
+                    err.style.display = 'block';
+                    document.getElementById('otp').focus();
+                    e.preventDefault();
+                } else if (!/^[0-9]{6}$/.test(otp)) {
+                    err.textContent = 'Mã OTP phải gồm đúng 6 chữ số!';
+                    err.style.display = 'block';
+                    document.getElementById('otp').focus();
+                    e.preventDefault();
+                }
+            });
+        </script>
 
         <div class="resend-box">
             Chưa nhận được mã? <a href="${pageContext.request.contextPath}/resend-otp?email=${email}">Gửi lại mã OTP</a>

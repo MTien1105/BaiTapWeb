@@ -28,8 +28,6 @@
     </style>
 </head>
 <body>
-    <jsp:include page="topbar.jsp" />
-
     <div class="reset-container">
         <h2>🔒 Thiết Lập Mật Khẩu Mới</h2>
         <p class="desc">Mã xác nhận OTP đã được gửi đến email:<br><strong>${email}</strong></p>

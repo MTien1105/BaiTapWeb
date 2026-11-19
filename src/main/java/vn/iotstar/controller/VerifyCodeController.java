@@ -92,6 +92,18 @@ public class VerifyCodeController extends HttpServlet {
             return;
         }
 
+        // Validate định dạng OTP 6 chữ số
+        if (!otp.trim().matches("^[0-9]{6}$")) {
+            req.setAttribute("email", email.trim());
+            req.setAttribute("alert", "Mã xác thực OTP phải gồm đúng 6 chữ số!");
+            HttpSession session = req.getSession(false);
+            if (session != null && session.getAttribute("demoOtp") != null) {
+                req.setAttribute("demoOtp", session.getAttribute("demoOtp"));
+            }
+            req.getRequestDispatcher(Constant.Path.VERIFY_CODE).forward(req, resp);
+            return;
+        }
+
         boolean verified = userService.verifyOtp(email.trim(), otp.trim());
         if (verified) {
             // Xóa thông tin tạm trong session
