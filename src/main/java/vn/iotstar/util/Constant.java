@@ -12,6 +12,7 @@ public class Constant {
     public static final String VIDEO_LIST = "/views/admin/video-list.jsp";
     public static final String VIDEO_ADD = "/views/admin/video-add.jsp";
     public static final String VIDEO_EDIT = "/views/admin/video-edit.jsp";
+    public static final String PROFILE = "/views/profile.jsp";
 
     public static class Path {
         public static final String REGISTER = "/views/register.jsp";
@@ -22,5 +23,6 @@ public class Constant {
         public static final String VIDEO_LIST = "/views/admin/video-list.jsp";
         public static final String VIDEO_ADD = "/views/admin/video-add.jsp";
         public static final String VIDEO_EDIT = "/views/admin/video-edit.jsp";
+        public static final String PROFILE = "/views/profile.jsp";
     }
 }

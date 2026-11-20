@@ -15,4 +15,6 @@ public interface UserDao {
     boolean checkExistEmail(String email);
     boolean checkExistUsername(String username);
     boolean checkExistPhone(String phone);
+    boolean checkExistEmailExceptUser(String email, int userId);
+    boolean checkExistPhoneExceptUser(String phone, int userId);
 }

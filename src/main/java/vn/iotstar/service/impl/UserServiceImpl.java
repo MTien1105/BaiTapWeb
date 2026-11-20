@@ -181,4 +181,14 @@ public class UserServiceImpl implements UserService {
     public boolean checkExistPhone(String phone) {
         return userDao.checkExistPhone(phone);
     }
+
+    @Override
+    public boolean checkExistEmailExceptUser(String email, int userId) {
+        return userDao.checkExistEmailExceptUser(email, userId);
+    }
+
+    @Override
+    public boolean checkExistPhoneExceptUser(String phone, int userId) {
+        return userDao.checkExistPhoneExceptUser(phone, userId);
+    }
 }

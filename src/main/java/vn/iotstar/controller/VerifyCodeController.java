@@ -73,7 +73,7 @@ public class VerifyCodeController extends HttpServlet {
             req.setAttribute("demoOtp", EmailUtil.getLastOtp());
         }
 
-        req.getRequestDispatcher(Constant.Path.VERIFY_CODE).forward(req, resp);
+        req.getRequestDispatcher(Constant.Path.VERIFY_CODE).include(req, resp);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class VerifyCodeController extends HttpServlet {
         if (email == null || email.trim().isEmpty() || otp == null || otp.trim().isEmpty()) {
             req.setAttribute("email", email);
             req.setAttribute("alert", "Vui lòng nhập đầy đủ mã xác nhận OTP!");
-            req.getRequestDispatcher(Constant.Path.VERIFY_CODE).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.VERIFY_CODE).include(req, resp);
             return;
         }
 
@@ -100,7 +100,7 @@ public class VerifyCodeController extends HttpServlet {
             if (session != null && session.getAttribute("demoOtp") != null) {
                 req.setAttribute("demoOtp", session.getAttribute("demoOtp"));
             }
-            req.getRequestDispatcher(Constant.Path.VERIFY_CODE).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.VERIFY_CODE).include(req, resp);
             return;
         }
 
@@ -121,7 +121,8 @@ public class VerifyCodeController extends HttpServlet {
             if (session != null && session.getAttribute("demoOtp") != null) {
                 req.setAttribute("demoOtp", session.getAttribute("demoOtp"));
             }
-            req.getRequestDispatcher(Constant.Path.VERIFY_CODE).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.VERIFY_CODE).include(req, resp);
         }
     }
 }
+

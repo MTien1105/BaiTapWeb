@@ -25,7 +25,7 @@ public class ForgotPasswordController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
+        req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).include(req, resp);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ForgotPasswordController extends HttpServlet {
 
         if (emailOrUsername == null || emailOrUsername.trim().isEmpty()) {
             req.setAttribute("alert", "Vui lòng nhập tên tài khoản hoặc email!");
-            req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).include(req, resp);
             return;
         }
 
@@ -50,7 +50,7 @@ public class ForgotPasswordController extends HttpServlet {
             String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
             if (!input.matches(emailRegex)) {
                 req.setAttribute("alert", "Địa chỉ email không đúng định dạng hợp lệ!");
-                req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).include(req, resp);
                 return;
             }
         }
@@ -59,7 +59,7 @@ public class ForgotPasswordController extends HttpServlet {
 
         if (user == null) {
             req.setAttribute("alert", "Không tìm thấy tài khoản nào khớp với thông tin đã nhập!");
-            req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).include(req, resp);
             return;
         }
 
@@ -74,7 +74,8 @@ public class ForgotPasswordController extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/reset-password?email=" + encodedEmail);
         } else {
             req.setAttribute("alert", "Có lỗi xảy ra khi tạo mã OTP. Vui lòng thử lại!");
-            req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.FORGOT_PASSWORD).include(req, resp);
         }
     }
 }
+

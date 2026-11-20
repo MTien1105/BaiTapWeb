@@ -72,7 +72,7 @@ public class VideoController extends HttpServlet {
                 List<User> userList = userService.findAll();
                 req.setAttribute("userList", userList);
             }
-            req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
 
         } else if (uri.contains("/admin/video/edit")) {
             String videoId = req.getParameter("id");
@@ -95,7 +95,7 @@ public class VideoController extends HttpServlet {
                 req.setAttribute("userList", userList);
             }
             req.setAttribute("video", video);
-            req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).include(req, resp);
 
         } else if (uri.contains("/admin/video/delete")) {
             String videoId = req.getParameter("id");
@@ -140,7 +140,7 @@ public class VideoController extends HttpServlet {
             }
 
             req.setAttribute("videoList", list);
-            req.getRequestDispatcher(Constant.Path.VIDEO_LIST).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.VIDEO_LIST).include(req, resp);
         }
     }
 
@@ -180,7 +180,7 @@ public class VideoController extends HttpServlet {
             if (videoId == null || videoId.trim().isEmpty()) {
                 req.setAttribute("error", "Mã video (Video ID) không được để trống!");
                 if (isAdmin) req.setAttribute("userList", userService.findAll());
-                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
                 return;
             }
 
@@ -188,7 +188,7 @@ public class VideoController extends HttpServlet {
             if (!videoId.matches("^[a-zA-Z0-9_-]{2,50}$")) {
                 req.setAttribute("error", "Mã video phải từ 2 đến 50 ký tự, chỉ gồm chữ cái, chữ số, gạch nối (-), gạch dưới (_), không chứa dấu tiếng Việt và khoảng trắng!");
                 if (isAdmin) req.setAttribute("userList", userService.findAll());
-                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
                 return;
             }
 
@@ -196,7 +196,7 @@ public class VideoController extends HttpServlet {
             if (videoService.findById(videoId) != null) {
                 req.setAttribute("error", "Mã video '" + videoId + "' đã tồn tại trong hệ thống! Vui lòng chọn mã khác.");
                 if (isAdmin) req.setAttribute("userList", userService.findAll());
-                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
                 return;
             }
 
@@ -204,7 +204,7 @@ public class VideoController extends HttpServlet {
             if (title == null || title.trim().isEmpty()) {
                 req.setAttribute("error", "Tiêu đề video không được để trống!");
                 if (isAdmin) req.setAttribute("userList", userService.findAll());
-                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
                 return;
             }
 
@@ -212,14 +212,14 @@ public class VideoController extends HttpServlet {
             if (title.length() < 3) {
                 req.setAttribute("error", "Tiêu đề video phải có tối thiểu 3 ký tự!");
                 if (isAdmin) req.setAttribute("userList", userService.findAll());
-                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
                 return;
             }
 
             if (title.length() > 500) {
                 req.setAttribute("error", "Tiêu đề video không được vượt quá 500 ký tự!");
                 if (isAdmin) req.setAttribute("userList", userService.findAll());
-                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
                 return;
             }
 
@@ -231,13 +231,13 @@ public class VideoController extends HttpServlet {
                     if (views < 0) {
                         req.setAttribute("error", "Số lượt xem (Views) phải là số nguyên không âm (>= 0)!");
                         if (isAdmin) req.setAttribute("userList", userService.findAll());
-                        req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                        req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
                         return;
                     }
                 } catch (NumberFormatException e) {
                     req.setAttribute("error", "Số lượt xem (Views) không hợp lệ, phải là số nguyên!");
                     if (isAdmin) req.setAttribute("userList", userService.findAll());
-                    req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                    req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
                     return;
                 }
             }
@@ -263,7 +263,7 @@ public class VideoController extends HttpServlet {
                     if (!submittedFileName.matches(".*\\.(jpg|jpeg|png|gif|webp)$")) {
                         req.setAttribute("error", "File ảnh tải lên không đúng định dạng! Chỉ chấp nhận: .jpg, .jpeg, .png, .gif, .webp.");
                         if (isAdmin) req.setAttribute("userList", userService.findAll());
-                        req.getRequestDispatcher(Constant.Path.VIDEO_ADD).forward(req, resp);
+                        req.getRequestDispatcher(Constant.Path.VIDEO_ADD).include(req, resp);
                         return;
                     }
                 }
@@ -322,7 +322,7 @@ public class VideoController extends HttpServlet {
                 req.setAttribute("video", existing);
                 req.setAttribute("isAdmin", isAdmin);
                 if (isAdmin) req.setAttribute("userList", userService.findAll());
-                req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).include(req, resp);
                 return;
             }
 
@@ -332,7 +332,7 @@ public class VideoController extends HttpServlet {
                 req.setAttribute("video", existing);
                 req.setAttribute("isAdmin", isAdmin);
                 if (isAdmin) req.setAttribute("userList", userService.findAll());
-                req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).include(req, resp);
                 return;
             }
 
@@ -341,7 +341,7 @@ public class VideoController extends HttpServlet {
                 req.setAttribute("video", existing);
                 req.setAttribute("isAdmin", isAdmin);
                 if (isAdmin) req.setAttribute("userList", userService.findAll());
-                req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).include(req, resp);
                 return;
             }
 
@@ -355,7 +355,7 @@ public class VideoController extends HttpServlet {
                         req.setAttribute("video", existing);
                         req.setAttribute("isAdmin", isAdmin);
                         if (isAdmin) req.setAttribute("userList", userService.findAll());
-                        req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                        req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).include(req, resp);
                         return;
                     }
                 } catch (NumberFormatException e) {
@@ -363,7 +363,7 @@ public class VideoController extends HttpServlet {
                     req.setAttribute("video", existing);
                     req.setAttribute("isAdmin", isAdmin);
                     if (isAdmin) req.setAttribute("userList", userService.findAll());
-                    req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                    req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).include(req, resp);
                     return;
                 }
             }
@@ -391,7 +391,7 @@ public class VideoController extends HttpServlet {
                         req.setAttribute("video", existing);
                         req.setAttribute("isAdmin", isAdmin);
                         if (isAdmin) req.setAttribute("userList", userService.findAll());
-                        req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).forward(req, resp);
+                        req.getRequestDispatcher(Constant.Path.VIDEO_EDIT).include(req, resp);
                         return;
                     }
                 }

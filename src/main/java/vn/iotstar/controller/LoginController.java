@@ -64,7 +64,7 @@ public class LoginController extends HttpServlet {
             session.removeAttribute("flashMessage");
         }
 
-        req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+        req.getRequestDispatcher(Constant.Path.LOGIN).include(req, resp);
     }
 
     @Override
@@ -89,25 +89,25 @@ public class LoginController extends HttpServlet {
         // SERVER-SIDE VALIDATION
         if (username == null || username.trim().isEmpty()) {
             req.setAttribute("alert", "Vui lòng nhập tên tài khoản!");
-            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.LOGIN).include(req, resp);
             return;
         }
 
         if (password == null || password.trim().isEmpty()) {
             req.setAttribute("alert", "Vui lòng nhập mật khẩu!");
-            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.LOGIN).include(req, resp);
             return;
         }
 
         if (username.trim().length() < 3) {
             req.setAttribute("alert", "Tên tài khoản phải có ít nhất 3 ký tự!");
-            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.LOGIN).include(req, resp);
             return;
         }
 
         if (password.length() < 6) {
             req.setAttribute("alert", "Mật khẩu phải có ít nhất 6 ký tự!");
-            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.LOGIN).include(req, resp);
             return;
         }
 
@@ -116,7 +116,7 @@ public class LoginController extends HttpServlet {
         // 1. Kiểm tra tài khoản tồn tại và kiểm tra mật khẩu đã hash bằng BCrypt
         if (user == null || !PasswordUtil.checkPassword(password, user.getPassWord())) {
             req.setAttribute("alert", "Tên tài khoản hoặc mật khẩu không chính xác!");
-            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.LOGIN).include(req, resp);
             return;
         }
 
@@ -124,7 +124,7 @@ public class LoginController extends HttpServlet {
         if (user.getStatus() == 0) {
             req.setAttribute("unactivatedEmail", user.getEmail());
             req.setAttribute("alert", "Tài khoản chưa được kích hoạt qua mã OTP!");
-            req.getRequestDispatcher(Constant.Path.LOGIN).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.LOGIN).include(req, resp);
             return;
         }
 
@@ -152,3 +152,4 @@ public class LoginController extends HttpServlet {
         response.addCookie(cookie);
     }
 }
+

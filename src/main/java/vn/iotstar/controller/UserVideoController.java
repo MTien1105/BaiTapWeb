@@ -58,7 +58,7 @@ public class UserVideoController extends HttpServlet {
 
             req.setAttribute("video", video);
             req.setAttribute("relatedVideos", relatedVideos);
-            req.getRequestDispatcher("/views/video-detail.jsp").forward(req, resp);
+            req.getRequestDispatcher("/views/video-detail.jsp").include(req, resp);
             return;
         }
 
@@ -133,6 +133,7 @@ public class UserVideoController extends HttpServlet {
         req.setAttribute("targetUser", targetUser);
         req.setAttribute("userList", userList);
 
-        req.getRequestDispatcher("/views/user-video.jsp").forward(req, resp);
+        req.getRequestDispatcher("/views/user-video.jsp").include(req, resp);
     }
 }
+

@@ -40,7 +40,7 @@ public class ResetPasswordController extends HttpServlet {
             req.setAttribute("demoResetOtp", EmailUtil.getLastOtp());
         }
 
-        req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
+        req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).include(req, resp);
     }
 
     @Override
@@ -63,26 +63,26 @@ public class ResetPasswordController extends HttpServlet {
         if (email == null || otp == null || newPassword == null || confirmPassword == null ||
                 email.trim().isEmpty() || otp.trim().isEmpty() || newPassword.trim().isEmpty() || confirmPassword.trim().isEmpty()) {
             req.setAttribute("alert", "Vui lòng nhập đầy đủ tất cả các trường thông tin!");
-            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).include(req, resp);
             return;
         }
 
         // Validate OTP định dạng 6 chữ số
         if (!otp.trim().matches("^[0-9]{6}$")) {
             req.setAttribute("alert", "Mã OTP xác thực phải gồm đúng 6 chữ số!");
-            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).include(req, resp);
             return;
         }
 
         if (newPassword.length() < 6) {
             req.setAttribute("alert", "Mật khẩu mới phải có tối thiểu 6 ký tự!");
-            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).include(req, resp);
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
             req.setAttribute("alert", "Mật khẩu mới và mật khẩu xác nhận không khớp nhau!");
-            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).include(req, resp);
             return;
         }
 
@@ -96,7 +96,8 @@ public class ResetPasswordController extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/login");
         } else {
             req.setAttribute("alert", "Mã xác thực OTP không chính xác hoặc đã hết hạn!");
-            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).forward(req, resp);
+            req.getRequestDispatcher(Constant.Path.RESET_PASSWORD).include(req, resp);
         }
     }
 }
+

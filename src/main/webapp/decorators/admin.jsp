@@ -10,14 +10,10 @@
     <!-- Bootstrap 5.3 CSS Template -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background-color: #f4f6f9;
             color: #333;
         }
@@ -36,8 +32,8 @@
 </head>
 <body class="d-flex flex-column h-100">
 
-    <!-- Header Navbar Component Bootstrap -->
-    <jsp:include page="/common/web/header.jsp" />
+    <!-- Header Navbar Component Bootstrap (Static Include an toan tuyet doi) -->
+    <%@ include file="/common/web/header.jsp" %>
 
     <!-- Admin Banner Ribbon -->
     <div class="admin-banner d-flex justify-content-between align-items-center">
@@ -58,8 +54,8 @@
         <sitemesh:write property="body"/>
     </main>
 
-    <!-- Footer Component Bootstrap -->
-    <jsp:include page="/common/web/footer.jsp" />
+    <!-- Footer Component Bootstrap (Static Include an toan tuyet doi) -->
+    <%@ include file="/common/web/footer.jsp" %>
 
     <!-- Bootstrap 5.3 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

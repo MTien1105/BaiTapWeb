@@ -1,18 +1,13 @@
 <sitemesh>
 
-    <!-- Khai báo Decorator cho khu vực Người dùng chung (/*) -->
-    <mapping path="/*" name="web" decorator="web.jsp" />
+    <!-- Khai bao Decorator Prefix de Sitemesh tu dong tim file layout trong thu muc /decorators/ theo yeu cau cua thay -->
+    <decorator-prefix>/decorators/</decorator-prefix>
 
-    <!-- Khai báo Decorator cho khu vực Quản trị (/admin/*) -->
+    <!-- Khai bao Decorator cho giao dien Web chung (/*) va Admin (/admin/*) -->
+    <mapping path="/*" name="web" decorator="web.jsp" />
     <mapping path="/admin/*" name="admin" decorator="admin.jsp" />
 
-    <!-- Exclude path from decoration: Ngăn chặn đệ quy decorator và tài nguyên tĩnh -->
+    <!-- Exclude path from decoration theo dung yeu cau Buoc 3 cua thay -->
     <mapping path="/api*" exclude="true" />
-    <mapping path="/common/*" exclude="true" />
-    <mapping path="/commons/*" exclude="true" />
-    <mapping path="/decorators/*" exclude="true" />
-    <mapping path="/uploads/*" exclude="true" />
-    <mapping path="/static/*" exclude="true" />
-    <mapping path="/assets/*" exclude="true" />
 
 </sitemesh>

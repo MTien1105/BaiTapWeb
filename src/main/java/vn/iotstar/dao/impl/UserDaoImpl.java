@@ -224,4 +224,40 @@ public class UserDaoImpl implements UserDao {
             em.close();
         }
     }
+
+    @Override
+    public boolean checkExistEmailExceptUser(String email, int userId) {
+        if (email == null || email.trim().isEmpty()) {
+            return false;
+        }
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(u) FROM User u WHERE LOWER(u.email) = :email AND u.id != :userId";
+            Long count = em.createQuery(jpql, Long.class)
+                    .setParameter("email", email.trim().toLowerCase())
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+            return count != null && count > 0;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public boolean checkExistPhoneExceptUser(String phone, int userId) {
+        if (phone == null || phone.trim().isEmpty()) {
+            return false;
+        }
+        EntityManager em = JPAConfig.getEntityManager();
+        try {
+            String jpql = "SELECT COUNT(u) FROM User u WHERE u.phone = :phone AND u.id != :userId";
+            Long count = em.createQuery(jpql, Long.class)
+                    .setParameter("phone", phone.trim())
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+            return count != null && count > 0;
+        } finally {
+            em.close();
+        }
+    }
 }

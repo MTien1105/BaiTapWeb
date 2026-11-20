@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -109,7 +110,7 @@
                                     <c:choose>
                                         <c:when test="${not empty v.poster}">
                                             <c:choose>
-                                                <c:when test="${v.poster.startsWith('http')}">
+                                                <c:when test="${fn:startsWith(v.poster, 'http') or v.poster.startsWith('http')}">
                                                     <img src="${v.poster}" alt="${v.title}" onerror="this.src='https://placehold.co/400x225?text=Video+Image';">
                                                 </c:when>
                                                 <c:otherwise>
@@ -132,7 +133,7 @@
                                 <div class="video-desc" title="${v.description}">${v.description != null ? v.description : 'Không có mô tả nội dung.'}</div>
                                 <div class="video-footer">
                                     <span class="uploader-tag">
-                                        👤 <c:out value="${v.user.fullName}" default="Hệ thống" />
+                                        👤 <c:out value="${v.user != null ? v.user.fullName : 'Hệ thống'}" />
                                     </span>
                                     <span style="color: #888; font-size: 11px;">Mã: ${v.videoId}</span>
                                 </div>

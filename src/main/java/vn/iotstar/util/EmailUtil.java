@@ -122,4 +122,23 @@ public class EmailUtil {
                 + "<p style=\"font-size: 12px; color: #999; text-align: center;\">Đây là thư tự động từ hệ thống Shopping System. Vui lòng không trả lời thư này.</p>"
                 + "</div>";
     }
+
+    /**
+     * Tạo mẫu email xác nhận cập nhật địa chỉ Email mới
+     */
+    public static String buildUpdateEmailOtp(String fullName, String otp, String newEmail) {
+        lastOtp = otp;
+        return "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;\">"
+                + "<h2 style=\"color: #0d6efd; text-align: center;\">XÁC NHẬN CẬP NHẬT EMAIL MỚI</h2>"
+                + "<p>Xin chào <strong>" + (fullName != null ? fullName : "Quý khách") + "</strong>,</p>"
+                + "<p>Hệ thống nhận được yêu cầu cập nhật địa chỉ email tài khoản của bạn thành: <strong style=\"color: #0d6efd;\">" + newEmail + "</strong>.</p>"
+                + "<p>Để xác nhận và hoàn tất việc cập nhật, vui lòng nhập mã OTP bên dưới vào trang thông tin cá nhân của bạn:</p>"
+                + "<div style=\"background-color: #f8f9fa; border: 2px dashed #0d6efd; padding: 15px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #0d6efd; margin: 20px 0;\">"
+                + otp
+                + "</div>"
+                + "<p style=\"color: #6c757d; font-size: 13px;\">Mã OTP có hiệu lực trong vòng 10 phút. Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua thư này để bảo vệ tài khoản.</p>"
+                + "<hr style=\"border: none; border-top: 1px solid #eee; margin: 20px 0;\">"
+                + "<p style=\"font-size: 12px; color: #999; text-align: center;\">Đây là thư tự động từ hệ thống Shopping System. Vui lòng không trả lời thư này.</p>"
+                + "</div>";
+    }
 }

@@ -59,23 +59,21 @@
                         <c:otherwise>
                             <div class="dropdown">
                                 <button class="btn btn-secondary dropdown-toggle d-flex align-items-center gap-2 py-1 px-3 rounded-pill bg-dark border-secondary" type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center fw-bold" style="width: 28px; height: 28px; font-size: 13px;">
-                                        <c:choose>
-                                            <c:when test="${not empty sessionScope.account.fullName}">
-                                                ${sessionScope.account.fullName.substring(0, 1).toUpperCase()}
-                                            </c:when>
-                                            <c:otherwise>
-                                                ${sessionScope.account.userName.substring(0, 1).toUpperCase()}
-                                            </c:otherwise>
-                                        </c:choose>
+                                    <i class="bi bi-person-circle fs-5 text-primary"></i>
+                                    <span class="text-white fw-semibold small">
+                                        <c:out value="${sessionScope.account.fullName != null ? sessionScope.account.fullName : sessionScope.account.userName}" />
                                     </span>
-                                    <span class="text-white fw-semibold small">${sessionScope.account.fullName}</span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userMenuBtn">
                                     <li class="px-3 py-2 border-bottom">
-                                        <div class="fw-bold text-dark">${sessionScope.account.fullName}</div>
-                                        <div class="small text-muted">@${sessionScope.account.userName} | Role ${sessionScope.account.roleid}</div>
-                                        <div class="small text-muted text-truncate" style="max-width: 200px;">${sessionScope.account.email}</div>
+                                        <div class="fw-bold text-dark"><c:out value="${sessionScope.account.fullName}" /></div>
+                                        <div class="small text-muted">@<c:out value="${sessionScope.account.userName}" /> | Role <c:out value="${sessionScope.account.roleid}" /></div>
+                                        <div class="small text-muted text-truncate" style="max-width: 200px;"><c:out value="${sessionScope.account.email}" /></div>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/profile">
+                                            <i class="bi bi-person-lines-fill me-2 text-info"></i> Hồ sơ cá nhân
+                                        </a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item py-2" href="${pageContext.request.contextPath}/video?userId=${sessionScope.account.id}">

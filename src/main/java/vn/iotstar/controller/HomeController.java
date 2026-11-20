@@ -1,6 +1,7 @@
 package vn.iotstar.controller;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
@@ -23,10 +24,15 @@ public class HomeController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html; charset=UTF-8");
 
-        // Lấy 10 video mới nhất đang ở trạng thái hoạt động (Active = 1)
-        List<Video> top10Videos = videoService.findTop10Latest();
-        req.setAttribute("top10Videos", top10Videos);
+        try {
+            // Lấy 10 video mới nhất đang ở trạng thái hoạt động (Active = 1)
+            List<Video> top10Videos = videoService.findTop10Latest();
+            req.setAttribute("top10Videos", top10Videos != null ? top10Videos : Collections.emptyList());
+        } catch (Throwable e) {
+            System.err.println("[HomeController ERROR] Lỗi khi truy vấn video: " + e.getMessage());
+            req.setAttribute("top10Videos", Collections.emptyList());
+        }
 
-        req.getRequestDispatcher("/views/home.jsp").forward(req, resp);
+        req.getRequestDispatcher("/views/home.jsp").include(req, resp);
     }
 }
